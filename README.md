@@ -20,6 +20,7 @@ MyGameEngine.sln
 ├── 2. EngineCore (Static Library, .lib) [Graphics 내부로 API 격리]
 │   ├── Core/ (Window 생성, TimeManager, PoolAllocator)
 │   ├── Graphics/ (GraphicDevice, VertexBuffer, ShaderFile) ◀ [D3D11 격리 구역]
+|   ├── Renderer/ ➔ CharacterRenderer, MapRenderer 등 렌더링 기능 제공하는 렌더링 엔진
 │   └── Resource/ (ResourceManager, OBJLoader, GLTFLoader)
 │
 └── 3. CollisionManager (Static Library, .lib) [그래픽스 의존성 제거 시킨다]
