@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="EngineCore">
+      <UniqueIdentifier>{c5e671ab-32a4-480c-a92d-0342bf8c35cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineCore\Graphics">
+      <UniqueIdentifier>{05aad901-57ea-469a-af45-36b9e7ad0eee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineCore\Graphics\D3D11">
+      <UniqueIdentifier>{f752f19e-dd05-440f-b64d-b933e09854a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineCore\Graphics\D3D11\source">
+      <UniqueIdentifier>{97aea960-0b14-4242-93a7-f9ad5b719280}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineCore\Graphics\D3D11\header">
+      <UniqueIdentifier>{e2d91852-2936-4c2c-94b7-afd7550fe6b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineCore\Renderer">
+      <UniqueIdentifier>{7561f413-2fb0-47e6-a6d7-88d1574eb468}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineCore\Renderer\header">
+      <UniqueIdentifier>{6f973131-2db1-4b01-9517-d34fcada0b6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineCore\Renderer\source">
+      <UniqueIdentifier>{80d49efa-3cf3-4723-85fb-a241d5e715ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineCore\core">
+      <UniqueIdentifier>{e25493d0-c2de-4dcb-ad52-58f6129a9b2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineCore\core\header">
+      <UniqueIdentifier>{f850068b-af3c-4fa3-a3aa-8a708df08d8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineCore\core\source">
+      <UniqueIdentifier>{ee778a8e-a49b-4d2d-a530-3b6478d103c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineCore\Math">
+      <UniqueIdentifier>{a71581ad-9edc-4595-9dcf-204fc9cee6bf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D3D11RendererAPI.h">
+      <Filter>EngineCore\Graphics\D3D11\header</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11Context.h">
+      <Filter>EngineCore\Graphics\D3D11\header</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11Buffer.h">
+      <Filter>EngineCore\Graphics\D3D11\header</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11ConstantBuffer.h">
+      <Filter>EngineCore\Graphics\D3D11\header</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11Texture.h">
+      <Filter>EngineCore\Graphics\D3D11\header</Filter>
+    </ClInclude>
+    <ClInclude Include="RendererAPI.h">
+      <Filter>EngineCore\Renderer\header</Filter>
+    </ClInclude>
+    <ClInclude Include="Base.h">
+      <Filter>EngineCore\core\header</Filter>
+    </ClInclude>
+    <ClInclude Include="Buffer.h">
+      <Filter>EngineCore\Renderer\header</Filter>
+    </ClInclude>
+    <ClInclude Include="Math.h">
+      <Filter>EngineCore\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>EngineCore\Renderer\header</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11Shader.h">
+      <Filter>EngineCore\Graphics\D3D11\header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="buffer.cpp">
+      <Filter>EngineCore\Renderer\source</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
