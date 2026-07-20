@@ -81,5 +81,11 @@
     <ClCompile Include="buffer.cpp">
       <Filter>EngineCore\Renderer\source</Filter>
     </ClCompile>
+    <ClCompile Include="D3D11Context.cpp">
+      <Filter>EngineCore\Graphics\D3D11\source</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D11Shader.cpp">
+      <Filter>EngineCore\Graphics\D3D11\source</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -3,6 +3,17 @@
   "WorkspaceRootPath": "E:\\MyGameEngine\\GameEngine\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|E:\\MyGameEngine\\GameEngine\\Base.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|solutionrelative:Base.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|C:\\PROGRAM FILES\\MICROSOFT VISUAL STUDIO\\2022\\COMMUNITY\\VC\\TOOLS\\MSVC\\14.44.35207\\INCLUDE\\TYPEINFO||{3B902123-F8A7-4915-9F01-361F908088D0}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|E:\\MyGameEngine\\GameEngine\\RendererAPI.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|solutionrelative:RendererAPI.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|E:\\MyGameEngine\\GameEngine\\Buffer.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|solutionrelative:Buffer.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
@@ -11,28 +22,16 @@
       "RelativeMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|solutionrelative:buffer.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|E:\\MyGameEngine\\GameEngine\\D3D11RendererAPI.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|solutionrelative:D3D11RendererAPI.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|E:\\MyGameEngine\\GameEngine\\D3D11Buffer.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|solutionrelative:D3D11Buffer.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|E:\\MyGameEngine\\GameEngine\\RendererAPI.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|solutionrelative:RendererAPI.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|E:\\MyGameEngine\\GameEngine\\Math.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|solutionrelative:Math.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|E:\\MyGameEngine\\GameEngine\\Mesh.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|solutionrelative:Mesh.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|E:\\MyGameEngine\\GameEngine\\D3D11Shader.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|solutionrelative:D3D11Shader.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|E:\\MyGameEngine\\GameEngine\\Mesh.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|solutionrelative:Mesh.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|E:\\MyGameEngine\\GameEngine\\D3D11Buffer.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{7E7CE090-C90D-4062-ACC1-955F22312E42}|GameEngine.vcxproj|solutionrelative:D3D11Buffer.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -42,7 +41,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 142,
-          "SelectedChildIndex": 7,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -54,81 +53,75 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Base.h",
+              "DocumentMoniker": "E:\\MyGameEngine\\GameEngine\\Base.h",
+              "RelativeDocumentMoniker": "Base.h",
+              "ToolTip": "E:\\MyGameEngine\\GameEngine\\Base.h",
+              "RelativeToolTip": "Base.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-07-12T05:54:19.61Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "buffer.cpp",
-              "DocumentMoniker": "E:\\MyGameEngine\\GameEngine\\buffer.cpp",
-              "RelativeDocumentMoniker": "buffer.cpp",
-              "ToolTip": "E:\\MyGameEngine\\GameEngine\\buffer.cpp",
-              "RelativeToolTip": "buffer.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2026-07-09T08:28:32.169Z",
+              "Title": "typeinfo",
+              "DocumentMoniker": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\include\\typeinfo",
+              "ToolTip": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\include\\typeinfo",
+              "ViewState": "AgIAADYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-07-14T02:01:39.121Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "D3D11RendererAPI.h",
-              "DocumentMoniker": "E:\\MyGameEngine\\GameEngine\\D3D11RendererAPI.h",
-              "RelativeDocumentMoniker": "D3D11RendererAPI.h",
-              "ToolTip": "E:\\MyGameEngine\\GameEngine\\D3D11RendererAPI.h",
-              "RelativeToolTip": "D3D11RendererAPI.h",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-07-09T08:28:03.231Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "D3D11Buffer.h",
-              "DocumentMoniker": "E:\\MyGameEngine\\GameEngine\\D3D11Buffer.h",
-              "RelativeDocumentMoniker": "D3D11Buffer.h",
-              "ToolTip": "E:\\MyGameEngine\\GameEngine\\D3D11Buffer.h",
-              "RelativeToolTip": "D3D11Buffer.h",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-07-09T08:28:01.377Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
               "Title": "RendererAPI.h",
               "DocumentMoniker": "E:\\MyGameEngine\\GameEngine\\RendererAPI.h",
               "RelativeDocumentMoniker": "RendererAPI.h",
               "ToolTip": "E:\\MyGameEngine\\GameEngine\\RendererAPI.h",
               "RelativeToolTip": "RendererAPI.h",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACcAAAApAAAAAAAAAA==",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAADEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-07-09T08:06:06.441Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-12T09:12:25.033Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "Math.h",
-              "DocumentMoniker": "E:\\MyGameEngine\\GameEngine\\Math.h",
-              "RelativeDocumentMoniker": "Math.h",
-              "ToolTip": "E:\\MyGameEngine\\GameEngine\\Math.h",
-              "RelativeToolTip": "Math.h",
-              "ViewState": "AgIAALUCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-07-09T08:05:48.758Z",
-              "EditorCaption": ""
+              "DocumentIndex": 4,
+              "Title": "buffer.cpp",
+              "DocumentMoniker": "E:\\MyGameEngine\\GameEngine\\buffer.cpp",
+              "RelativeDocumentMoniker": "buffer.cpp",
+              "ToolTip": "E:\\MyGameEngine\\GameEngine\\buffer.cpp",
+              "RelativeToolTip": "buffer.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-07-12T06:54:49.877Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "Buffer.h",
               "DocumentMoniker": "E:\\MyGameEngine\\GameEngine\\Buffer.h",
               "RelativeDocumentMoniker": "Buffer.h",
               "ToolTip": "E:\\MyGameEngine\\GameEngine\\Buffer.h",
               "RelativeToolTip": "Buffer.h",
-              "ViewState": "AgIAACEAAAAAAAAAAAAAAB8AAAAxAAAAAAAAAA==",
+              "ViewState": "AgIAACEAAAAAAAAAAAAAACsAAAAhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-07-07T13:40:13.935Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-11T01:02:30.864Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "D3D11Buffer.h",
+              "DocumentMoniker": "E:\\MyGameEngine\\GameEngine\\D3D11Buffer.h",
+              "RelativeDocumentMoniker": "D3D11Buffer.h",
+              "ToolTip": "E:\\MyGameEngine\\GameEngine\\D3D11Buffer.h",
+              "RelativeToolTip": "D3D11Buffer.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-07-09T08:28:01.377Z"
             },
             {
               "$type": "Document",
@@ -140,18 +133,17 @@
               "RelativeToolTip": "D3D11Shader.h",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-07-07T14:22:53.438Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-07T14:22:53.438Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 5,
               "Title": "Mesh.h",
               "DocumentMoniker": "E:\\MyGameEngine\\GameEngine\\Mesh.h",
               "RelativeDocumentMoniker": "Mesh.h",
               "ToolTip": "E:\\MyGameEngine\\GameEngine\\Mesh.h",
               "RelativeToolTip": "Mesh.h",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAACgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2026-07-07T13:40:11.95Z"
             }

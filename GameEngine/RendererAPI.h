@@ -23,16 +23,16 @@ namespace MJEngine
 		};
 
 	public:
-		virtual ~RendererAPI() = default;
+		~RendererAPI() = default;
 		
-		virtual void init() = 0;
-		virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width,uint32_t height );
+		virtual void Init() = 0;
+		virtual void SetViewport(Vector_2i offset, uint32_t width,uint32_t height ) = 0;
 		
 		// Hazel 엔진의 virtual void SetClearColor(const glm::vec4& color) = 0; 
 		// 다음의 함수가 glm 을 사용한다(해당 엔진에서는 d3d11 환경에서는 directMath 이외는 glm 사용 할 계획)
 		// math 인터페이스 제작후 해당 
 		// virtual void SetClearColor(const MJEngine::vec4& color) = 0; 대체 필요
-		virtual void SetClearColor(const Vector_4f& color);
+		virtual void SetClearColor(const Vector_4f& color) = 0;
 
 		virtual void Clear() = 0;
 
@@ -45,11 +45,11 @@ namespace MJEngine
 		
 		virtual void SetLineWidth(float width) = 0;
 
-		static API GetAPI() { return s_API;  }
+		static API GetAPI() { return m_api;  }
 		static ScopePtr<RendererAPI> Create();
 
 	private:
-		static API s_API;
+		static API m_api;
 		// 전역공간에 저장됨 그래서 static API GetAPI() 해당 매서드에서 접근이 가능한것
 		// but 컴파일 과정에서 비 해당 객체 매서드 접근시 에러 -> 런타임은? 그대로 취약성이긴함..
 	};

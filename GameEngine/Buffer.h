@@ -6,7 +6,7 @@
 #include <vector>
 
 /*
-	해당 코드는
+ 	해당 코드는
 	VertexElement 란 정점내의 하나의 자료형의 단위형태로 정의되며 
 	여러 요소가 혼합된 정점에 대해서 
 	std::vector<VertexElement> m_Elements; 다음과 같이 저장하며
@@ -96,37 +96,37 @@ namespace MJEngine
 		VertexLayout() {}; // = default 의 경우 위에처럼 메모리 생성과 동시에 초기화 해주는 형태가 아니면 쓰리값이 들어갈 수 있음
 
 		VertexLayout(std::initializer_list<VertexElement> vertexLayout)
-			: m_VertexLayout(vertexLayout)
+			: m_vertexLayout(vertexLayout)
 		{
 			CalculateOffsetsAndStride();
 		}
-		uint32_t GetStride() const { return m_Stride; }
-		const std::vector<VertexElement>& GetElements() const { return m_VertexLayout; }
+		uint32_t GetStride() const { return m_stride; }
+		const std::vector<VertexElement>& GetElements() const { return m_vertexLayout; }
 
-		std::vector<VertexElement>::iterator begin() { return m_VertexLayout.begin(); }
+		std::vector<VertexElement>::iterator begin() { return m_vertexLayout.begin(); }
 
-		std::vector<VertexElement>::iterator end() { return m_VertexLayout.end(); }
+		std::vector<VertexElement>::iterator end() { return m_vertexLayout.end(); }
 
-		std::vector<VertexElement>::const_iterator begin() const { return m_VertexLayout.begin(); }
+		std::vector<VertexElement>::const_iterator begin() const { return m_vertexLayout.begin(); }
 
-		std::vector<VertexElement>::const_iterator end() const { return m_VertexLayout.end(); }
+		std::vector<VertexElement>::const_iterator end() const { return m_vertexLayout.end(); }
 
 	private:
 		void CalculateOffsetsAndStride()
 		{
 			size_t offset = 0;
-			m_Stride = 0;
+			m_stride = 0;
 			
-			for (auto& element : m_VertexLayout)
+			for (auto& element : m_vertexLayout)
 			{
 				element.offset = offset;
 				offset += element.size;
-				m_Stride += element.size;
+				m_stride += element.size;
 			}
 		}
 	private:
-		std::vector<VertexElement> m_VertexLayout;
-		uint32_t m_Stride = 0;
+		std::vector<VertexElement> m_vertexLayout;
+		uint32_t m_stride = 0;
 
 	};
 

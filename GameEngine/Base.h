@@ -30,7 +30,6 @@ namespace MJEngine
 	}
 
 
-
 }
 
 #endif // !BASE_H
