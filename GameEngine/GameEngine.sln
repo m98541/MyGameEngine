@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36221.1 d17.14
+VisualStudioVersion = 17.14.36221.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameEngine", "GameEngine.vcxproj", "{7E7CE090-C90D-4062-ACC1-955F22312E42}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShaderInfoManager", "..\ShaderInfoManager\ShaderInfoManager.vcxproj", "{E29A831B-27CF-4B7A-BD1A-9710F8FEB3A9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShaderIO", "..\ShaderIO\ShaderIO.vcxproj", "{DF485CE1-959B-41FE-B8C4-1B1B333BE932}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,22 @@ Global
 		{7E7CE090-C90D-4062-ACC1-955F22312E42}.Release|x64.Build.0 = Release|x64
 		{7E7CE090-C90D-4062-ACC1-955F22312E42}.Release|x86.ActiveCfg = Release|Win32
 		{7E7CE090-C90D-4062-ACC1-955F22312E42}.Release|x86.Build.0 = Release|Win32
+		{E29A831B-27CF-4B7A-BD1A-9710F8FEB3A9}.Debug|x64.ActiveCfg = Debug|x64
+		{E29A831B-27CF-4B7A-BD1A-9710F8FEB3A9}.Debug|x64.Build.0 = Debug|x64
+		{E29A831B-27CF-4B7A-BD1A-9710F8FEB3A9}.Debug|x86.ActiveCfg = Debug|Win32
+		{E29A831B-27CF-4B7A-BD1A-9710F8FEB3A9}.Debug|x86.Build.0 = Debug|Win32
+		{E29A831B-27CF-4B7A-BD1A-9710F8FEB3A9}.Release|x64.ActiveCfg = Release|x64
+		{E29A831B-27CF-4B7A-BD1A-9710F8FEB3A9}.Release|x64.Build.0 = Release|x64
+		{E29A831B-27CF-4B7A-BD1A-9710F8FEB3A9}.Release|x86.ActiveCfg = Release|Win32
+		{E29A831B-27CF-4B7A-BD1A-9710F8FEB3A9}.Release|x86.Build.0 = Release|Win32
+		{DF485CE1-959B-41FE-B8C4-1B1B333BE932}.Debug|x64.ActiveCfg = Debug|x64
+		{DF485CE1-959B-41FE-B8C4-1B1B333BE932}.Debug|x64.Build.0 = Debug|x64
+		{DF485CE1-959B-41FE-B8C4-1B1B333BE932}.Debug|x86.ActiveCfg = Debug|Win32
+		{DF485CE1-959B-41FE-B8C4-1B1B333BE932}.Debug|x86.Build.0 = Debug|Win32
+		{DF485CE1-959B-41FE-B8C4-1B1B333BE932}.Release|x64.ActiveCfg = Release|x64
+		{DF485CE1-959B-41FE-B8C4-1B1B333BE932}.Release|x64.Build.0 = Release|x64
+		{DF485CE1-959B-41FE-B8C4-1B1B333BE932}.Release|x86.ActiveCfg = Release|Win32
+		{DF485CE1-959B-41FE-B8C4-1B1B333BE932}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

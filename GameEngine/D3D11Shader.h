@@ -40,6 +40,17 @@
 	쉐이더를 관리시킴(예를 들어 한 파이프를 버텍 쉐이더 + 픽셀 쉐이더로 돌린다면 이를 각각 버텍 쉐이더 , 픽셀 쉐이더 로 따로 관리)
 	단 import 이후 쉐이더 관리자는 파이프 구성시 쉐이더 간 input output 구성 검사정도는 필요 -> 맞지 않은경우 컴파일 에러(런타인 검은화면으로 에러 확인시 너무 크게 아쉬워짐)
 	
+	메인 쉐이더에 모든 헤더를
+	#ifdef SYMBOL_1
+	#include "shader.hlsli"
+	#endif 
+	를 전부 포함하는 방식으로는 어려움(할때마다 전체 포맷 유지하면서 메인 쉐이더를 수정해줘야하는 요구사항 필요해짐)
+	header.hlsli를 만들어 
+	JSON 집합 받으면 컴파일 전단계에서 요소를 읽어가면서(header.hlsli 는 무조건 컴퓨터가 작성해야함 사람이 수기 입력 절대 금지)
+	각 요소에 대한 아래 항목을 이어 붙인 헤더 집합 생성 이후 메인 쉐이더는 header.hlsli 만을 include 하여 처리시킴 => 즉 각 JSON 요소는 SYMBOL 정보와 헤더 string 정보를 포함하고 있어야 함
+	#ifdef SYMBOL_1
+	#include "shader.hlsli"
+	#endif
 */
 
 #endif // !D3D11_SHADER_H
