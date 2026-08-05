@@ -128,6 +128,7 @@
     <ClCompile Include="ShaderInfoIO.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ShaderBase.h" />
     <ClInclude Include="RenderPassInfo.h" />
     <ClInclude Include="ShaderInfo.h" />
     <ClInclude Include="ShaderInfoIO.h" />

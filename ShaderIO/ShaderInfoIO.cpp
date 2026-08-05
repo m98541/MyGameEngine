@@ -85,7 +85,7 @@ void ShaderInfoIO::WriteShaderInfo(const char* jsonFileName, const char* jsonFil
 
 
 
-const std::vector<std::string>& ShaderInfoIO::GetShaderIdList()const
+const std::vector<std::string> ShaderInfoIO::GetShaderIdList()const
 {
 	std::vector<std::string> re = {};
 
@@ -104,6 +104,7 @@ bool ShaderInfoIO::FindShader(std::string id, ShaderInfo& outShader)const
 	if (shader != m_shaderMap.end())
 	{
 		outShader = shader->second;
+		return true;
 	}
 	else
 	{

@@ -11,7 +11,7 @@ public:
 	void WriteShaderInfo(const char* jsonFileName ,const char* jsonFilePath);
 
 
-	const std::vector<std::string>& GetShaderIdList()const;
+	const std::vector<std::string> GetShaderIdList()const;
 	bool FindShader(std::string id, ShaderInfo& outShader)const;
 	void SetShader(std::string id, ShaderInfo element);
 	void DeleteShader(std::string id);
