@@ -18,39 +18,37 @@ void ShaderInfoIO::ReadShaderInfo(const char* jsonFilePath)
 
 	rapidjson::StringStream jsonStringStream(tempFileBuffer.c_str());
 	rapidjson::Document jsonDoc;
-	m_shaderMap.clear();
-	while (jsonStringStream.Peek() != '\0')
-	{
-		while (
-			jsonStringStream.Peek() == ' ' ||
-			jsonStringStream.Peek() == '\n' ||
-			jsonStringStream.Peek() == '\r' ||
-			jsonStringStream.Peek() == '\t'
-			)
-		{
-			jsonStringStream.Take();
-		}
-
-		if (jsonStringStream.Peek() == '\0')
-			break;
-
-		jsonDoc.ParseStream<rapidjson::kParseStopWhenDoneFlag>(jsonStringStream);
-
-		if (jsonDoc.HasParseError())
-		{
-			// 이후 커스텀 개발이 assert 가 필요함... 지금 당장 Windows용 으로만 땜방해두기에는 .. 일단 ShaderInfo 이후 assert 도 바로 개발 필요..
-			std::cerr << "[File Read(Parse) Error] ShaderInfoIO / ReadShaderInfo\n"
-				<< "File Path : " << jsonFilePath << "\n"
-				<< "Error Code: " << jsonDoc.GetParseError() << "\n"
-				<< "Offset    : " << jsonDoc.GetErrorOffset() << std::endl;
-			assert(false && "file read(parse) error || ShaderInfoIO / ReadShaderInfo-2 ");
-		}
-
-		ShaderInfo shaderElement = {};
-		shaderElement.ReadRapidJson(jsonDoc);
-		m_shaderMap[shaderElement.m_id] = shaderElement;
+	jsonDoc.ParseStream(jsonStringStream);
+	if (jsonDoc.HasParseError()) {
+		throw std::runtime_error("JSON parse error");
 	}
+	const rapidjson::Value& jsonValue = jsonDoc;
 
+
+	m_shaderMap.clear();
+
+	if (jsonValue.HasMember(KEY_SHADER_TABLE))
+	{
+		const auto& arr = jsonValue[KEY_SHADER_TABLE].GetArray();
+		m_shaderCount = arr.Size();
+
+		if (m_shaderCount == 0)
+		{
+			//assert! 빈테이블 가지고 있음
+		}
+
+		for (int i = 0; i < m_shaderCount; i++)
+		{
+			ShaderInfo element;
+			element.ReadJsonObject(arr[i]);
+			m_shaderMap[element.m_id] = element;
+
+		}
+	}
+	else
+	{
+		//assert! JSON 파일내 테이블 존재 X 
+	}
 
 	file.close();
 }
@@ -69,16 +67,18 @@ void ShaderInfoIO::WriteShaderInfo(const char* jsonFileName, const char* jsonFil
 	rapidjson::StringBuffer stringBuffer;
 	rapidjson::Writer<rapidjson::StringBuffer> writer(stringBuffer);
 
+	writer.StartObject();
+	writer.Key(KEY_SHADER_TABLE);
+	writer.StartArray();
 	for (const auto& shaderInfo : m_shaderMap)
 	{
-		stringBuffer.Clear();
-		writer.Reset(stringBuffer);
-
-		shaderInfo.second.WriteRapidJson(writer);
-		
-		file << stringBuffer.GetString() << "\n";
+		shaderInfo.second.WriteJsonObject(writer);
 	}
+	writer.EndArray();
+	writer.EndObject();
 
+
+	file << stringBuffer.GetString();
 	file.close();
 
 }

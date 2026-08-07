@@ -43,6 +43,12 @@ struct ShaderIOLayoutElement
 
 	void WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const;
 	void ReadJsonObject(const rapidjson::Value& jsonValue);
+
+	static constexpr const char* KEY_FORMAT = "format";
+	static constexpr const char* KEY_NAME = "name";
+	static constexpr const char* KEY_SYSTEM_VALUE = "systemValue";
+	static constexpr const char* KEY_SEMANTIC_INDEX = "semanticIndex";
+	static constexpr const char* KEY_LOCATION = "location";
 };
 
 struct GlobalVariableElement
@@ -55,12 +61,17 @@ struct GlobalVariableElement
 
 	void WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const;
 	void ReadJsonObject(const rapidjson::Value& jsonValue);
+
+	static constexpr const char* KEY_VARIABLE_NAME = "variableName";
+	static constexpr const char* KEY_FORMAT = "format";
+	static constexpr const char* KEY_OFFSET = "offset";
+	static constexpr const char* KEY_SIZE = "size";
 };
 
 struct GlobalVariableBuffer
 {
 	std::string bufferName;
-	uint32_t bufferSize = 0; // 16byte 정렬 위한 -> 16배수 메모리 필요
+	size_t bufferSize = 0; 
 	std::vector<GlobalVariableElement> buffer;
 
 	//HLSL 
@@ -73,6 +84,14 @@ struct GlobalVariableBuffer
 
 	void WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const;
 	void ReadJsonObject(const rapidjson::Value& jsonValue);
+
+	static constexpr const char* KEY_BUFFER_NAME = "bufferName";
+	static constexpr const char* KEY_BUFFER_SIZE = "bufferSize";
+	static constexpr const char* KEY_BUFFER = "buffer";
+	static constexpr const char* KEY_REG_SPACE = "registerSpace";
+	static constexpr const char* KEY_REG_NUM = "registerNumber";
+	static constexpr const char* KEY_SET_NUM = "set";
+	static constexpr const char* KEY_BINDING = "binding";
 };
 
 
@@ -95,10 +114,28 @@ struct ShaderInfo
 
 	std::string m_entryPoint;
 	std::string m_shaderFilePath;
-	std::string m_shaderHeader;
+	// 중간 표현 파일 경로 쉐이더 관리 툴에서 컴파일 후 해당 경로 저장
+	/*
+		이후 관리과정에서 
+		쉐이더 저장과 컴파일 저장을 분리하면 불일치 문제가 발생 할 수 있음
+		쉐이더의 경우 등록(업데이트)와 동시에 컴파일 되어 지정되어야함 
+	*/
+	std::string m_shaderIRFilePath;
 
 	void WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const;
 	void ReadJsonObject(const rapidjson::Value& jsonValue);
+
+
+	static constexpr const char* KEY_ID = "id";
+	static constexpr const char* KEY_STAGE = "stage";
+	static constexpr const char* KEY_INPUT_LAYOUT = "inputLayout";
+	static constexpr const char* KEY_OUTPUT_LAYOUT = "outputLayout";
+	static constexpr const char* KEY_CONSTANT_BUFFERS = "constantBuffers";
+	static constexpr const char* KEY_TEXTURE_SAMPLERS = "textureSamplers";
+	static constexpr const char* KEY_TARGET_PROFILE_VERSION = "targetProfileVersion";
+	static constexpr const char* KEY_ENTRY_POINT = "entryPoint";
+	static constexpr const char* KEY_SHADER_FILE_PATH = "shaderFilePath";
+	static constexpr const char* KEY_SHADER_IR_FILE_PATH = "shaderIRFilePath";
 	
 };
 

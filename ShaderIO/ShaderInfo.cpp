@@ -11,14 +11,14 @@ const
 {
 	writer.StartObject();
 
-	writer.Key("id");
+	writer.Key(KEY_ID);
 	writer.String(m_id.c_str());
 
-	writer.Key("stage");
+	writer.Key(KEY_STAGE);
 	writer.Int(static_cast<int>(m_stage));
 
 
-	writer.Key("inputLayout");
+	writer.Key(KEY_INPUT_LAYOUT);
 	writer.StartArray();
 	for (const auto& oLayout : m_inputLayout)
 	{
@@ -26,7 +26,7 @@ const
 	}
 	writer.EndArray();
 
-	writer.Key("outputLayout");
+	writer.Key(KEY_OUTPUT_LAYOUT);
 	writer.StartArray();
 	for (const auto& oLayout : m_outputLayout)
 	{
@@ -34,7 +34,7 @@ const
 	}
 	writer.EndArray();
 
-	writer.Key("constantBuffers");
+	writer.Key(KEY_CONSTANT_BUFFERS);
 	writer.StartArray();
 	for (const auto& cBuffer : m_constantBuffers)
 	{
@@ -42,7 +42,7 @@ const
 	}
 	writer.EndArray();
 
-	writer.Key("textureSamplers");
+	writer.Key(KEY_TEXTURE_SAMPLERS);
 	writer.StartArray();
 	for (const auto& texSampler : m_textureSamplers)
 		writer.String(texSampler.c_str());
@@ -50,20 +50,18 @@ const
 
 
 
-	writer.Key("targetProfileVersion");
-	writer.StartObject();
-
-	writer.EndObject();
+	writer.Key(KEY_TARGET_PROFILE_VERSION);
+	writer.Uint(static_cast<unsigned int>(m_targetProfileVersion));
 
 
-	writer.Key("entryPoint");
+	writer.Key(KEY_ENTRY_POINT);
 	writer.String(m_entryPoint.c_str());
 
-	writer.Key("shaderFilePath");
+	writer.Key(KEY_SHADER_FILE_PATH);
 	writer.String(m_shaderFilePath.c_str());
 
-	writer.Key("shaderHeader");
-	writer.String(m_shaderHeader.c_str());
+	writer.Key(KEY_SHADER_IR_FILE_PATH);
+	writer.String(m_shaderIRFilePath.c_str());
 	
 	writer.EndObject();
 }
@@ -80,11 +78,11 @@ void ShaderInfo::ReadJsonObject(const rapidjson::Value& jsonValue)
 			assert(false && "shader jsonValue read fail - jsonValue type is not Object (Object type required) | ShaderInfo.cpp\ReadRadpidJson");
 	}
 
-	if (jsonValue.HasMember("id"))
+	if (jsonValue.HasMember(KEY_ID))
 	{
-		if (jsonValue["id"].IsString())
+		if (jsonValue[KEY_ID].IsString())
 		{
-			m_id = jsonValue["id"].GetString();
+			m_id = jsonValue[KEY_ID].GetString();
 		}
 		else
 		{
@@ -92,11 +90,11 @@ void ShaderInfo::ReadJsonObject(const rapidjson::Value& jsonValue)
 		}
 	}
 
-	if (jsonValue.HasMember("stage"))
+	if (jsonValue.HasMember(KEY_STAGE))
 	{
-		if (jsonValue["stage"].IsInt())
+		if (jsonValue[KEY_STAGE].IsInt())
 		{
-			m_stage = static_cast<PipeLineStage>( jsonValue["stage"].GetInt() );
+			m_stage = static_cast<PipeLineStage>( jsonValue[KEY_STAGE].GetInt() );
 		}
 		else
 		{
@@ -104,14 +102,14 @@ void ShaderInfo::ReadJsonObject(const rapidjson::Value& jsonValue)
 		}
 	}
 
-	if (jsonValue.HasMember("inputLayout"))
+	if (jsonValue.HasMember(KEY_INPUT_LAYOUT))
 	{
-		if (jsonValue["inputLayout"].IsArray())
+		if (jsonValue[KEY_INPUT_LAYOUT].IsArray())
 		{
 			m_inputLayout.clear();
-			for (const auto& iLayout : jsonValue["inputLayout"].GetArray())
+			for (const auto& iLayout : jsonValue[KEY_INPUT_LAYOUT].GetArray())
 			{
-				if (iLayout.IsString())
+				if (iLayout.IsObject())
 				{
 					ShaderIOLayoutElement tempLayout;
 					tempLayout.ReadJsonObject(iLayout);
@@ -119,7 +117,7 @@ void ShaderInfo::ReadJsonObject(const rapidjson::Value& jsonValue)
 				}
 				else
 				{
-					assert(false && "shader jsonValue read fail - jsonValue(shader InputLayout element) type is not String | ShaderInfo.cpp\ReadRadpidJson");
+					assert(false && "shader jsonValue read fail - jsonValue(shader InputLayout element) type is not Object| ShaderInfo.cpp\ReadRadpidJson");
 				}
 			}
 		}
@@ -129,14 +127,14 @@ void ShaderInfo::ReadJsonObject(const rapidjson::Value& jsonValue)
 		}
 	}
 
-	if (jsonValue.HasMember("outputLayout"))
+	if (jsonValue.HasMember(KEY_OUTPUT_LAYOUT))
 	{
-		if (jsonValue["outputLayout"].IsArray())
+		if (jsonValue[KEY_OUTPUT_LAYOUT].IsArray())
 		{
 			m_outputLayout.clear();
-			for (const auto& iLayout : jsonValue["outputLayout"].GetArray())
+			for (const auto& iLayout : jsonValue[KEY_OUTPUT_LAYOUT].GetArray())
 			{
-				if (iLayout.IsString())
+				if (iLayout.IsObject())
 				{
 					ShaderIOLayoutElement tempLayout;
 					tempLayout.ReadJsonObject(iLayout);
@@ -144,7 +142,7 @@ void ShaderInfo::ReadJsonObject(const rapidjson::Value& jsonValue)
 				}
 				else
 				{
-					assert(false && "shader jsonValue read fail - jsonValue(shader outputLayout element) type is not String | ShaderInfo.cpp\ReadRadpidJson");
+					assert(false && "shader jsonValue read fail - jsonValue(shader outputLayout element) type is not Object | ShaderInfo.cpp\ReadRadpidJson");
 				}
 			}
 		}
@@ -154,14 +152,14 @@ void ShaderInfo::ReadJsonObject(const rapidjson::Value& jsonValue)
 		}
 	}
 
-	if (jsonValue.HasMember("constantBuffers"))
+	if (jsonValue.HasMember(KEY_CONSTANT_BUFFERS))
 	{
-		if (jsonValue["constantBuffers"].IsArray())
+		if (jsonValue[KEY_CONSTANT_BUFFERS].IsArray())
 		{
 			m_constantBuffers.clear();
-			for (const auto& iLayout : jsonValue["constantBuffers"].GetArray())
+			for (const auto& iLayout : jsonValue[KEY_CONSTANT_BUFFERS].GetArray())
 			{
-				if (iLayout.IsString())
+				if (iLayout.IsObject())
 				{
 					GlobalVariableBuffer tempGlobalVariableBuffer;
 					tempGlobalVariableBuffer.ReadJsonObject(iLayout);
@@ -179,12 +177,12 @@ void ShaderInfo::ReadJsonObject(const rapidjson::Value& jsonValue)
 		}
 	}
 
-	if (jsonValue.HasMember("textureSamplers"))
+	if (jsonValue.HasMember(KEY_TEXTURE_SAMPLERS))
 	{
-		if (jsonValue["textureSamplers"].IsArray())
+		if (jsonValue[KEY_TEXTURE_SAMPLERS].IsArray())
 		{
 			m_textureSamplers.clear();
-			for (const auto& iLayout : jsonValue["textureSamplers"].GetArray())
+			for (const auto& iLayout : jsonValue[KEY_TEXTURE_SAMPLERS].GetArray())
 			{
 				if (iLayout.IsString())
 				{
@@ -203,24 +201,17 @@ void ShaderInfo::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 
 
-	if (jsonValue.HasMember("targetProfileVersion"))
-	{
-		if (jsonValue["targetProfileVersion"].IsString())
-		{
-			
-			m_targetProfileVersion =static_cast<ShaderProfileVersion>(jsonValue["targetProfileVersion"].GetUint());
-		}
-		else
-		{
-			assert(false && "shader jsonValue read fail - jsonValue(targetProfileVersion) type is not String | ShaderInfo.cpp\ReadRadpidJson");
-		}
+	if (jsonValue.HasMember(KEY_TARGET_PROFILE_VERSION))
+	{		
+		m_targetProfileVersion =static_cast<ShaderProfileVersion>(jsonValue[KEY_TARGET_PROFILE_VERSION].GetUint());
 	}
 
-	if (jsonValue.HasMember("entryPoint"))
+
+	if (jsonValue.HasMember(KEY_ENTRY_POINT))
 	{
-		if (jsonValue["entryPoint"].IsString())
+		if (jsonValue[KEY_ENTRY_POINT].IsString())
 		{
-			m_entryPoint = jsonValue["entryPoint"].GetString();
+			m_entryPoint = jsonValue[KEY_ENTRY_POINT].GetString();
 		}
 		else
 		{
@@ -228,11 +219,11 @@ void ShaderInfo::ReadJsonObject(const rapidjson::Value& jsonValue)
 		}
 	}
 
-	if (jsonValue.HasMember("shaderFilePath"))
+	if (jsonValue.HasMember(KEY_SHADER_FILE_PATH))
 	{
-		if (jsonValue["shaderFilePath"].IsString())
+		if (jsonValue[KEY_SHADER_FILE_PATH].IsString())
 		{
-			m_shaderFilePath = jsonValue["shaderFilePath"].GetString();
+			m_shaderFilePath = jsonValue[KEY_SHADER_FILE_PATH].GetString();
 		}
 		else
 		{
@@ -240,15 +231,15 @@ void ShaderInfo::ReadJsonObject(const rapidjson::Value& jsonValue)
 		}
 	}
 
-	if (jsonValue.HasMember("shaderHeader"))
+	if (jsonValue.HasMember(KEY_SHADER_IR_FILE_PATH))
 	{
-		if (jsonValue["shaderHeader"].IsString())
+		if (jsonValue[KEY_SHADER_IR_FILE_PATH].IsString())
 		{
-			m_shaderHeader = jsonValue["shaderHeader"].GetString();
+			m_shaderIRFilePath = jsonValue[KEY_SHADER_IR_FILE_PATH].GetString();
 		}
 		else
 		{
-			assert(false && "shader jsonValue read fail - jsonValue(shaderHeader) type is not String | ShaderInfo.cpp\ReadRadpidJson");
+			assert(false && "shader jsonValue read fail - jsonValue(shaderIRFilePath) type is not String | ShaderInfo.cpp\ReadRadpidJson");
 		}
 	}
 
@@ -261,16 +252,16 @@ void ShaderIOLayoutElement::WriteJsonObject(rapidjson::Writer<rapidjson::StringB
 {
 	writer.StartObject();
 	
-	writer.Key("format");
+	writer.Key(KEY_FORMAT);
 	writer.Uint(static_cast<unsigned int>(format));
 	
-	writer.Key("name");
+	writer.Key(KEY_NAME);
 	writer.String(name.c_str());
 
-	writer.Key("systemValue");
+	writer.Key(KEY_SYSTEM_VALUE);
 	writer.Bool(systemValue);
 
-	writer.Key("location");
+	writer.Key(KEY_LOCATION);
 	writer.Uint(static_cast<unsigned int>(location));
 
 	writer.EndObject();
@@ -291,45 +282,45 @@ void ShaderIOLayoutElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 			assert(false && "shader jsonValue read fail - jsonValue type is not Object (Object type required) | ShaderInfo.cpp-ShaderIOLayoutElement Read");
 	}
 
-	if (jsonValue.HasMember("format"))
+	if (jsonValue.HasMember(KEY_FORMAT))
 	{
-		format = static_cast<FORMAT>(jsonValue["format"].GetUint());
+		format = static_cast<FORMAT>(jsonValue[KEY_FORMAT].GetUint());
 	}
 	else
 	{
 		//향후 assert 개발시 추가 필요... 지금 string 직접 입력 방식 너무 노가다에 중구난방임
 	}
 
-	if (jsonValue.HasMember("name"))
+	if (jsonValue.HasMember(KEY_NAME))
 	{
-		name = jsonValue["name"].GetString();
+		name = jsonValue[KEY_NAME].GetString();
 	}
 	else
 	{
 
 	}
 
-	if (jsonValue.HasMember("systemValue"))
+	if (jsonValue.HasMember(KEY_SYSTEM_VALUE))
 	{
-		systemValue = jsonValue["systemValue"].GetBool();
+		systemValue = jsonValue[KEY_SYSTEM_VALUE].GetBool();
 	}
 	else
 	{
 
 	}
 
-	if (jsonValue.HasMember("semanticIndex"))
+	if (jsonValue.HasMember(KEY_SEMANTIC_INDEX))
 	{
-		semanticIndex = jsonValue["semanticIndex"].GetUint();
+		semanticIndex = jsonValue[KEY_SEMANTIC_INDEX].GetUint();
 	}
 	else
 	{
 
 	}
 
-	if (jsonValue.HasMember("location"))
+	if (jsonValue.HasMember(KEY_LOCATION))
 	{
-		location = jsonValue["location"].GetUint();
+		location = jsonValue[KEY_LOCATION].GetUint();
 	}
 	else
 	{
@@ -344,16 +335,16 @@ void GlobalVariableElement::WriteJsonObject(rapidjson::Writer<rapidjson::StringB
 {
 	writer.StartObject();
 	
-	writer.Key("bufferName");
+	writer.Key(KEY_VARIABLE_NAME);
 	writer.String(variableName.c_str());
 
-	writer.Key("format");
+	writer.Key(KEY_FORMAT);
 	writer.Uint(static_cast<unsigned int>(format));
 
-	writer.Key("offset");
+	writer.Key(KEY_OFFSET);
 	writer.Uint(static_cast<unsigned int>(offset));
 
-	writer.Key("size");
+	writer.Key(KEY_SIZE);
 	writer.Uint(static_cast<unsigned int>(size));
 
 	writer.EndObject();
@@ -372,39 +363,40 @@ void GlobalVariableElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 			assert(false && "shader jsonValue read fail - jsonValue type is not Object (Object type required) | ShaderInfo.cpp-GlobalVariableElement Read");
 	}
 
-	if (jsonValue.HasMember("variableName"))
+	if (jsonValue.HasMember(KEY_VARIABLE_NAME))
 	{
-		variableName = jsonValue["variableName"].GetString();
+		variableName = jsonValue[KEY_VARIABLE_NAME].GetString();
 	}
 	else
 	{
 
 	}
 
-	if (jsonValue.HasMember("format"))
+	if (jsonValue.HasMember(KEY_FORMAT))
 	{
-		format = static_cast<FORMAT>(jsonValue["format"].GetUint());
+		format = static_cast<FORMAT>(jsonValue[KEY_FORMAT].GetUint());
 	}
 	else
 	{
 
 	}
 
-	if (jsonValue.HasMember("offset"))
+	if (jsonValue.HasMember(KEY_OFFSET))
 	{
-		offset = static_cast<uint32_t>(jsonValue["offset"].GetUint());
+		offset = static_cast<uint32_t>(jsonValue[KEY_OFFSET].GetUint());
 	}
 	else
 	{
 
 	}
 
-	if (jsonValue.HasMember("size"))
+	if (jsonValue.HasMember(KEY_SIZE))
 	{
-		size = static_cast<uint32_t>(jsonValue["size"].GetUint());
+		size = static_cast<uint32_t>(jsonValue[KEY_SIZE].GetUint());
 	}
 	else
 	{
+
 	}
 }
 
@@ -412,13 +404,13 @@ void GlobalVariableBuffer::WriteJsonObject(rapidjson::Writer<rapidjson::StringBu
 {
 	writer.StartObject();
 
-	writer.Key("bufferName");
+	writer.Key(KEY_BUFFER_NAME);
 	writer.String(bufferName.c_str());
 
-	writer.Key("bufferSize");
-	writer.Uint(static_cast<unsigned int>(bufferSize));
+	writer.Key(KEY_BUFFER_SIZE);
+	writer.Uint(static_cast<unsigned int>(buffer.size()));
 
-	writer.Key("buffer");
+	writer.Key(KEY_BUFFER);
 	writer.StartArray();
 	for (const auto& element : buffer)
 	{
@@ -426,17 +418,17 @@ void GlobalVariableBuffer::WriteJsonObject(rapidjson::Writer<rapidjson::StringBu
 	}
 	writer.EndArray();
 
-	writer.Key("registerSpace");
+	writer.Key(KEY_REG_SPACE);
 	writer.Uint(static_cast<unsigned int>(registerSpace));
 
-	writer.Key("regNum");
+	writer.Key(KEY_REG_NUM);
 	writer.Uint(static_cast<unsigned int>(regNum));
 
 
-	writer.Key("set");
+	writer.Key(KEY_SET_NUM);
 	writer.Uint(static_cast<unsigned int>(set));
 
-	writer.Key("binding");
+	writer.Key(KEY_BINDING);
 	writer.Uint(static_cast<unsigned int>(binding));
 	
 	writer.EndObject();
@@ -454,31 +446,25 @@ void GlobalVariableBuffer::ReadJsonObject(const rapidjson::Value& jsonValue)
 			assert(false && "shader jsonValue read fail - jsonValue type is not Object (Object type required) | ShaderInfo.cpp-GlobalVariableBuffer Read");
 	}
 
-	if (jsonValue.HasMember("bufferName"))
+	if (jsonValue.HasMember(KEY_BUFFER_NAME))
 	{
-		bufferName = jsonValue["bufferName"].GetString();
+		bufferName = jsonValue[KEY_BUFFER_NAME].GetString();
 	}
 	else
 	{
 
 	}
 
-	if (jsonValue.HasMember("bufferSize"))
-	{
-		bufferSize = static_cast<uint32_t>(jsonValue["bufferSize"].GetUint());
-	}
-	else
-	{
 
-	}
-
-	if (jsonValue.HasMember("buffer"))
+	if (jsonValue.HasMember(KEY_BUFFER) && jsonValue[KEY_BUFFER].IsArray())
 	{
 		buffer.clear();
+		const auto& arr = jsonValue[KEY_BUFFER].GetArray();
+		bufferSize = arr.Size();
 		for (int i = 0; i < bufferSize; i++)
 		{
 			GlobalVariableElement element;
-			element.ReadJsonObject(jsonValue);
+			element.ReadJsonObject(arr[i]);
 			buffer.push_back(element);
 		}
 	}
@@ -487,36 +473,36 @@ void GlobalVariableBuffer::ReadJsonObject(const rapidjson::Value& jsonValue)
 
 	}
 
-	if (jsonValue.HasMember("registerSpace"))
+	if (jsonValue.HasMember(KEY_REG_SPACE))
 	{
-		registerSpace = static_cast<uint8_t>(jsonValue["registerSpace"].GetUint());
+		registerSpace = static_cast<uint8_t>(jsonValue[KEY_REG_SPACE].GetUint());
 	}
 	else
 	{
 
 	}
 
-	if (jsonValue.HasMember("regNum"))
+	if (jsonValue.HasMember(KEY_REG_NUM))
 	{
-		regNum = static_cast<uint8_t>(jsonValue["regNum"].GetUint());
+		regNum = static_cast<uint8_t>(jsonValue[KEY_REG_NUM].GetUint());
 	}
 	else
 	{
 
 	}
 
-	if (jsonValue.HasMember("set"))
+	if (jsonValue.HasMember(KEY_SET_NUM))
 	{
-		set = static_cast<uint8_t>(jsonValue["set"].GetUint());
+		set = static_cast<uint8_t>(jsonValue[KEY_SET_NUM].GetUint());
 	}
 	else
 	{
 
 	}
 
-	if (jsonValue.HasMember("binding"))
+	if (jsonValue.HasMember(KEY_BINDING))
 	{
-		binding = static_cast<uint8_t>(jsonValue["binding"].GetUint());
+		binding = static_cast<uint8_t>(jsonValue[KEY_BINDING].GetUint());
 	}
 	else
 	{
