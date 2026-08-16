@@ -1,6 +1,5 @@
 #include "ShaderInfoIO.h"
 
-
 #include <iostream>
 #include <experimental/filesystem>
 #include <fstream>
@@ -20,7 +19,8 @@ void ShaderInfoIO::ReadShaderInfo(const char* jsonFilePath)
 	rapidjson::Document jsonDoc;
 	jsonDoc.ParseStream(jsonStringStream);
 	if (jsonDoc.HasParseError()) {
-		throw std::runtime_error("JSON parse error");
+		//assert! json 파싱 에러!
+
 	}
 	const rapidjson::Value& jsonValue = jsonDoc;
 
@@ -36,14 +36,17 @@ void ShaderInfoIO::ReadShaderInfo(const char* jsonFilePath)
 		{
 			//assert! 빈테이블 가지고 있음
 		}
-
-		for (int i = 0; i < m_shaderCount; i++)
+		else
 		{
-			ShaderInfo element;
-			element.ReadJsonObject(arr[i]);
-			m_shaderMap[element.m_id] = element;
+			for (int i = 0; i < m_shaderCount; i++)
+			{
+				ShaderInfo element;
+				element.ReadJsonObject(arr[i]);
+				m_shaderMap[element.m_id] = element;
 
+			}
 		}
+		
 	}
 	else
 	{

@@ -51,7 +51,13 @@ enum class PRIMITIVE_TOPOLOGY : uint8_t
 
 enum class FORMAT : uint8_t
 {
-	// 32bit floating point format 
+	// 32bit integer format
+	R32_INT,
+	R32G32B32_INT,
+	R32_UINT,
+	R32G32B32_UINT,
+	
+	// 32bit floating point format
 	R32_FLOAT,
 	R32G32_FLOAT,
 	R32G32B32_FLOAT,
@@ -65,8 +71,10 @@ enum class FORMAT : uint8_t
 	R16G16B16A16_UNORM,
 
 	//8bit norm RGBA or BGRA
-	R8G8B8A8_UNORM
+	R8G8B8A8_UNORM,
 
+	//matrix 
+	MATRIX4X4
 
 };
 

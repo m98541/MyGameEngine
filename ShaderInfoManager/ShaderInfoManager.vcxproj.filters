@@ -13,10 +13,30 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="platform">
+      <UniqueIdentifier>{eb408ad1-81cb-4635-a3bd-f850d1c2a475}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="platform\D3D11">
+      <UniqueIdentifier>{26be53ee-085a-4297-9be3-90bcff8419b7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="ShaderCompile.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D11Compiler.cpp">
+      <Filter>platform\D3D11</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ShaderCompiler.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11Compiler.h">
+      <Filter>platform\D3D11</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

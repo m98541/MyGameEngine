@@ -6,8 +6,7 @@
 */
 
 
-void ShaderInfo::WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer)
-const
+void ShaderInfo::WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const
 {
 	writer.StartObject();
 
@@ -42,10 +41,17 @@ const
 	}
 	writer.EndArray();
 
-	writer.Key(KEY_TEXTURE_SAMPLERS);
+	writer.Key(KEY_TEXTURES);
 	writer.StartArray();
-	for (const auto& texSampler : m_textureSamplers)
-		writer.String(texSampler.c_str());
+	for (const auto& texture : m_textures)
+		texture.WriteJsonObject(writer);
+	writer.EndArray();
+
+
+	writer.Key(KEY_SAMPLERS);
+	writer.StartArray();
+	for (const auto& sampler : m_samplers)
+		sampler.WriteJsonObject(writer);
 	writer.EndArray();
 
 
@@ -177,20 +183,22 @@ void ShaderInfo::ReadJsonObject(const rapidjson::Value& jsonValue)
 		}
 	}
 
-	if (jsonValue.HasMember(KEY_TEXTURE_SAMPLERS))
+	if (jsonValue.HasMember(KEY_TEXTURES))
 	{
-		if (jsonValue[KEY_TEXTURE_SAMPLERS].IsArray())
+		if (jsonValue[KEY_TEXTURES].IsArray())
 		{
-			m_textureSamplers.clear();
-			for (const auto& iLayout : jsonValue[KEY_TEXTURE_SAMPLERS].GetArray())
+			m_textures.clear();
+			for (const auto& iLayout : jsonValue[KEY_TEXTURES].GetArray())
 			{
-				if (iLayout.IsString())
+				if (iLayout.IsObject())
 				{
-					m_textureSamplers.push_back(iLayout.GetString());
+					ResourceBindingElement tempResourceBindingElement;
+					tempResourceBindingElement.ReadJsonObject(iLayout);
+					m_textures.push_back(tempResourceBindingElement);
 				}
 				else
 				{
-					assert(false && "shader jsonValue read fail - jsonValue(shader textureSamplers element) type is not String | ShaderInfo.cpp\ReadRadpidJson");
+					assert(false && "shader jsonValue read fail - jsonValue(shader textureSamplers element) type is not Object | ShaderInfo.cpp\ReadRadpidJson");
 				}
 			}
 		}
@@ -199,6 +207,33 @@ void ShaderInfo::ReadJsonObject(const rapidjson::Value& jsonValue)
 			assert(false && "shader jsonValue read fail - jsonValue(shader textureSamplers) type is not Array | ShaderInfo.cpp\ReadRadpidJson");
 		}
 	}
+
+	if (jsonValue.HasMember(KEY_SAMPLERS))
+	{
+		if (jsonValue[KEY_SAMPLERS].IsArray())
+		{
+			m_samplers.clear();
+			for (const auto& iLayout : jsonValue[KEY_SAMPLERS].GetArray())
+			{
+				if (iLayout.IsObject())
+				{
+					ResourceBindingElement tempResourceBindingElement;
+					tempResourceBindingElement.ReadJsonObject(iLayout);
+					m_samplers.push_back(tempResourceBindingElement);
+				}
+				else
+				{
+					assert(false && "shader jsonValue read fail - jsonValue(shader textureSamplers element) type is not Object | ShaderInfo.cpp\ReadRadpidJson");
+				}
+			}
+		}
+		else
+		{
+			assert(false && "shader jsonValue read fail - jsonValue(shader textureSamplers) type is not Array | ShaderInfo.cpp\ReadRadpidJson");
+		}
+	}
+
+	
 
 
 	if (jsonValue.HasMember(KEY_TARGET_PROFILE_VERSION))
@@ -467,6 +502,90 @@ void GlobalVariableBuffer::ReadJsonObject(const rapidjson::Value& jsonValue)
 			element.ReadJsonObject(arr[i]);
 			buffer.push_back(element);
 		}
+	}
+	else
+	{
+
+	}
+
+	if (jsonValue.HasMember(KEY_REG_SPACE))
+	{
+		registerSpace = static_cast<uint8_t>(jsonValue[KEY_REG_SPACE].GetUint());
+	}
+	else
+	{
+
+	}
+
+	if (jsonValue.HasMember(KEY_REG_NUM))
+	{
+		regNum = static_cast<uint8_t>(jsonValue[KEY_REG_NUM].GetUint());
+	}
+	else
+	{
+
+	}
+
+	if (jsonValue.HasMember(KEY_SET_NUM))
+	{
+		set = static_cast<uint8_t>(jsonValue[KEY_SET_NUM].GetUint());
+	}
+	else
+	{
+
+	}
+
+	if (jsonValue.HasMember(KEY_BINDING))
+	{
+		binding = static_cast<uint8_t>(jsonValue[KEY_BINDING].GetUint());
+	}
+	else
+	{
+
+	}
+
+
+
+}
+
+void ResourceBindingElement::WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const
+{
+	writer.StartObject();
+
+	writer.Key(KEY_RESOURCE_NAME);
+	writer.String(resourceName.c_str());
+
+	writer.Key(KEY_REG_SPACE);
+	writer.Uint(static_cast<unsigned int>(registerSpace));
+
+	writer.Key(KEY_REG_NUM);
+	writer.Uint(static_cast<unsigned int>(regNum));
+
+
+	writer.Key(KEY_SET_NUM);
+	writer.Uint(static_cast<unsigned int>(set));
+
+	writer.Key(KEY_BINDING);
+	writer.Uint(static_cast<unsigned int>(binding));
+
+	writer.EndObject();
+}
+
+void ResourceBindingElement::ReadJsonObject(const rapidjson::Value& jsonValue)
+{
+	if (!jsonValue.IsObject())
+	{
+		if (jsonValue.IsArray())
+			assert(false && "shader jsonValue read fail - jsonValue type: Array! (Object type required) | ShaderInfo.cpp-GlobalVariableBuffer Read");
+		else if (jsonValue.IsNull())
+			assert(false && "shader jsonValue read fail - jsonValue is Null! | ShaderInfo.cpp-GlobalVariableBuffer Read");
+		else
+			assert(false && "shader jsonValue read fail - jsonValue type is not Object (Object type required) | ShaderInfo.cpp-GlobalVariableBuffer Read");
+	}
+
+	if (jsonValue.HasMember(KEY_RESOURCE_NAME))
+	{
+		resourceName = jsonValue[KEY_RESOURCE_NAME].GetString();
 	}
 	else
 	{

@@ -32,26 +32,49 @@ struct InputLayoutElement
 	uint32_t semanticIndex = 0;
 	//GLSL 전용 필드
 	uint32_t location = 0;
+
+	void WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const;
+	void ReadJsonObject(const rapidjson::Value& jsonValue);
+
+	static constexpr const char* KEY_NAME = "name";
+	static constexpr const char* KEY_FORMAT = "format";
+	static constexpr const char* KEY_INPUT_SLOT = "inputSlot";
+	static constexpr const char* KEY_ALIGNED_BYTE_OFFSET = "alignedByteOffset";
+	static constexpr const char* KEY_SEMANTIC_INDEX = "semanticIndex";
+	static constexpr const char* KEY_LOCATION = "location";
 };
 
 struct PassInputLayoutContext
 {
 	PRIMITIVE_TOPOLOGY primitiveTopology;
 	std::vector<InputLayoutElement> inputLayout;
+
+	void WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const;
+	void ReadJsonObject(const rapidjson::Value& jsonValue);
+
+	static constexpr const char* KEY_PRIMITIVE = "primitive";
+	static constexpr const char* KEY_INPUT_LAYOUT = "inputLayout";
 };
 
 struct PassElement
 {
-	std::string ShaderId;
+	std::string shaderId;
 	PipeLineStage stage;
-	bool IsValid;
+	bool isValid;
+	
+	void WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const;
+	void ReadJsonObject(const rapidjson::Value& jsonValue);
+
+	static constexpr const char* KEY_SHADER_ID = "shaderId";
+	static constexpr const char* KEY_STAGE = "stage";
+	static constexpr const char* KEY_IS_VALID = "isValid";
 };
 
 struct PassCheckResult
 {
 	bool errorFlag = 0; // 에러면 true 아니면 false
 	std::vector<PipeLineStage> errorPipe;
-	std::string Log;
+	std::string errorLog;
 };
 
 
@@ -77,7 +100,18 @@ public:
 	// IA 에 필요한 정보 제공 IA 포맷 , 프리미티브 , 정점 입력 레이아웃 정보 매개변수 방식 전달
 	void GetPassInputLayoutInfo(PassInputLayoutContext& outIAPrimitiveAndFormat ) const;
 
+	void WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const;
+	void ReadJsonObject(const rapidjson::Value& jsonValue);
+
+	static constexpr const char* KEY_RENDER_PASS_ID = "renderPassId";
+	static constexpr const char* KEY_MATERIAL_TAG = "materialTag";
+	static constexpr const char* KEY_PASS_INPUT_CONTEXT = "passInputContext";
+	static constexpr const char* KEY_PIPELINES = "pipeLines";
+
+	std::string renderPassId;
+	std::string materialTag;
 private:
+
 	PassInputLayoutContext m_passInputContext;
 	std::array<PassElement, GRAPHICS_STAGE_COUNT> m_pipeLines;
 };

@@ -75,7 +75,7 @@ struct GlobalVariableBuffer
 	std::vector<GlobalVariableElement> buffer;
 
 	//HLSL 
-	uint8_t registerSpace = 0;
+	uint8_t registerSpace = 0;// Dx12 Dx11의 경우 0으로 고정
 	uint8_t regNum = 0;
 
 	//GLSL 
@@ -95,6 +95,37 @@ struct GlobalVariableBuffer
 };
 
 
+struct ResourceBindingElement
+{
+	std::string resourceName;
+
+	// HLSL
+	uint8_t registerSpace = 0; 
+	uint8_t regNum = 0;       
+
+	// GLSL 
+	uint8_t set = 0;          
+	uint8_t binding = 0;      
+
+	void WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const;
+	void ReadJsonObject(const rapidjson::Value& jsonValue);
+
+	static constexpr const char* KEY_RESOURCE_NAME = "resourceName";
+	static constexpr const char* KEY_REG_SPACE = "registerSpace";
+	static constexpr const char* KEY_REG_NUM = "registerNumber";
+	static constexpr const char* KEY_SET_NUM = "set";
+	static constexpr const char* KEY_BINDING = "binding";
+};
+
+struct ShaderInfoDesc
+{
+	size_t inputLayoutCnt = 0;
+	size_t outLayoutCnt = 0;
+	size_t constantBuffersCnt = 0;
+	size_t texturesCnt = 0;
+	size_t samplersCnt = 0;
+
+};
 
 
 struct ShaderInfo
@@ -108,7 +139,9 @@ struct ShaderInfo
 	//HLSL 용 필드
 	std::vector<GlobalVariableBuffer> m_constantBuffers;
 
-	std::vector<std::string> m_textureSamplers;
+	std::vector<ResourceBindingElement> m_textures;
+
+	std::vector<ResourceBindingElement> m_samplers;
 
 	ShaderProfileVersion m_targetProfileVersion;
 
@@ -116,9 +149,9 @@ struct ShaderInfo
 	std::string m_shaderFilePath;
 	// 중간 표현 파일 경로 쉐이더 관리 툴에서 컴파일 후 해당 경로 저장
 	/*
-		이후 관리과정에서 
+		이후 관리과정에서
 		쉐이더 저장과 컴파일 저장을 분리하면 불일치 문제가 발생 할 수 있음
-		쉐이더의 경우 등록(업데이트)와 동시에 컴파일 되어 지정되어야함 
+		쉐이더의 경우 등록(업데이트)와 동시에 컴파일 되어 지정되어야함
 	*/
 	std::string m_shaderIRFilePath;
 
@@ -131,14 +164,13 @@ struct ShaderInfo
 	static constexpr const char* KEY_INPUT_LAYOUT = "inputLayout";
 	static constexpr const char* KEY_OUTPUT_LAYOUT = "outputLayout";
 	static constexpr const char* KEY_CONSTANT_BUFFERS = "constantBuffers";
-	static constexpr const char* KEY_TEXTURE_SAMPLERS = "textureSamplers";
+	static constexpr const char* KEY_TEXTURES = "textures";
+	static constexpr const char* KEY_SAMPLERS = "samplers";
 	static constexpr const char* KEY_TARGET_PROFILE_VERSION = "targetProfileVersion";
 	static constexpr const char* KEY_ENTRY_POINT = "entryPoint";
 	static constexpr const char* KEY_SHADER_FILE_PATH = "shaderFilePath";
 	static constexpr const char* KEY_SHADER_IR_FILE_PATH = "shaderIRFilePath";
-	
+
 };
-
-
 
 #endif // !SHADER_INFO_H

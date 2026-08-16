@@ -18,6 +18,10 @@ public:
 	void DeleteShader(std::string id);
 
 	void ClearShaderMap();
+
+	//shaderInfo 부분다 이렇게 교체 필요 유지관리가 훨씬 편리함
+	static constexpr const char* KEY_SHADER_COUNT = "shaderCount";
+	static constexpr const char* KEY_SHADER_TABLE = "shaderTable";
 	 
 private:
 
@@ -28,11 +32,6 @@ private:
 	
 	std::unordered_map< std::string, ShaderInfo > m_shaderMap;
 	
-
-private:
-	//shaderInfo 부분다 이렇게 교체 필요 유지관리가 훨씬 편리함
-	static constexpr const char* KEY_SHADER_COUNT = "shaderCount";
-	static constexpr const char* KEY_SHADER_TABLE = "shaderTable";
 };
 
 

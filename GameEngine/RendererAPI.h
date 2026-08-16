@@ -50,8 +50,7 @@ namespace MJEngine
 
 	private:
 		static API m_api;
-		// 전역공간에 저장됨 그래서 static API GetAPI() 해당 매서드에서 접근이 가능한것
-		// but 컴파일 과정에서 비 해당 객체 매서드 접근시 에러 -> 런타임은? 그대로 취약성이긴함..
+		
 	};
 
 }

@@ -124,10 +124,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="RenderPassInfo.cpp" />
+    <ClCompile Include="RenderPassInfoIO.cpp" />
     <ClCompile Include="ShaderInfo.cpp" />
     <ClCompile Include="ShaderInfoIO.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="RenderPassInfoIO.h" />
     <ClInclude Include="ShaderBase.h" />
     <ClInclude Include="RenderPassInfo.h" />
     <ClInclude Include="ShaderInfo.h" />
