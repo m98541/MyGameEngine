@@ -49,8 +49,24 @@ enum class PRIMITIVE_TOPOLOGY : uint8_t
 	PATCH_LIST_CONTROL_POINT_32
 };
 
+enum class VARIABLE_CLASS : uint8_t
+{
+	SCALAR = 0,
+	VECTOR,
+	MATRIX_ROWS,
+	MATRIX_COLUMNS,
+	OBJECT,
+	STRUCT,
+	INTERFACE_CLASS,
+	INTERFACE_POINTER
+};
+
 enum class FORMAT : uint8_t
 {
+	// object , struct
+	VOID0 = 0,
+
+	//scalar , vector , matrix
 	// 32bit integer format
 	R32_INT,
 	R32G32B32_INT,
@@ -67,6 +83,7 @@ enum class FORMAT : uint8_t
 	R16_FLOAT,
 	R16G16_FLOAT,
 	R16G16B16A16_FLOAT,
+
 	R16G16_UNORM,
 	R16G16B16A16_UNORM,
 
@@ -131,11 +148,11 @@ inline std::string GetHLSLTargetString(PipeLineStage stage, ShaderProfileVersion
 	std::string versionStr;
 	switch (version)
 	{
-	case ShaderProfileVersion::HLSL_5_0: versionStr = "5_0"; break;
-	case ShaderProfileVersion::HLSL_5_1: versionStr = "5_1"; break;
-	case ShaderProfileVersion::HLSL_6_0: versionStr = "6_0"; break;
-	case ShaderProfileVersion::HLSL_6_5: versionStr = "6_5"; break;
-	case ShaderProfileVersion::HLSL_6_6: versionStr = "6_6"; break;
+	case ShaderProfileVersion::HLSL_5_0: version = "5_0"; break;
+	case ShaderProfileVersion::HLSL_5_1: version = "5_1"; break;
+	case ShaderProfileVersion::HLSL_6_0: version = "6_0"; break;
+	case ShaderProfileVersion::HLSL_6_5: version = "6_5"; break;
+	case ShaderProfileVersion::HLSL_6_6: version = "6_6"; break;
 	default: return "";
 	}
 

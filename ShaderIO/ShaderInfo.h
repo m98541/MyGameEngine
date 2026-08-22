@@ -51,28 +51,63 @@ struct ShaderIOLayoutElement
 	static constexpr const char* KEY_LOCATION = "location";
 };
 
-struct GlobalVariableElement
+struct GlobalVariableType
 {
-	std::string variableName;
 	FORMAT format;
+	VARIABLE_CLASS variableClass;
+	uint32_t elementsCnt = 1; // 배열 원소 수 (기본 1) scalar
 
+	uint32_t GetByteSize() const; // format 크기 * elements
+	uint32_t GetFormatByteSize() const; //format 크기
+
+	void WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const;
+	void ReadJsonObject(const rapidjson::Value& jsonValue);
+
+	static constexpr const char* KEY_FORMAT = "format";
+	static constexpr const char* KEY_VARIABLE_CLASS = "variableClass";
+	static constexpr const char* KEY_OFFSET = "offset";
+	static constexpr const char* KEY_ELEMENTS_CNT = "elementsCnt";
+};
+
+
+// 동일 포맷 값인가 아닌가로 지정 scalar , vector , matrix 등은 모두 동일 포맷 변수로 
+// 예시(DirectX11): D3D11TypeToVariableFormat 에 의하여 그 Type 이 결정되어 저장되어짐
+// 단일 포맷 값이 아닌 struct , class 등은 재귀적인 구조로 다시 SearchVariable 를 호출하여 
+// 동일 포맷 변수 까지 탐색함 
+// 즉 Type 으로 leaf 여부를 결정함
+
+struct GlobalVariable
+{	
+	std::string variableName;
+	uint32_t baseOffset = 0;// 부모의 시작 offset
 	uint32_t offset = 0;
-	uint32_t size = 0;
+	uint32_t byteSize = 0;
+	GlobalVariableType variableType;
+	std::vector<GlobalVariable> members; // scalar 인경우 size 0 호출 자체 X
+
+	// 최상의 변수만이 사이즈를 가질 수 있음 
+	// 하부 구조적인 변수에 대해서는 사이즈 필드에 대해 비활성화 
+	// 
+	static constexpr uint32_t INVALID_SIZE = 0xFFFFFFFF;
 
 	void WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const;
 	void ReadJsonObject(const rapidjson::Value& jsonValue);
 
 	static constexpr const char* KEY_VARIABLE_NAME = "variableName";
-	static constexpr const char* KEY_FORMAT = "format";
+	static constexpr const char* KEY_BASE_OFFSET = "baseOffset";
 	static constexpr const char* KEY_OFFSET = "offset";
-	static constexpr const char* KEY_SIZE = "size";
+	static constexpr const char* KEY_BYTE_SIZE = "byteSize";
+	static constexpr const char* KEY_VARIABLE_TYPE = "variableType";
+	static constexpr const char* KEY_VARIABLE_MEMBERS = "variableMembers";
+
 };
+
 
 struct GlobalVariableBuffer
 {
 	std::string bufferName;
-	size_t bufferSize = 0; 
-	std::vector<GlobalVariableElement> buffer;
+	uint32_t bufferByteSize = 0;
+	std::vector<GlobalVariable> variables;
 
 	//HLSL 
 	uint8_t registerSpace = 0;// Dx12 Dx11의 경우 0으로 고정
@@ -86,7 +121,7 @@ struct GlobalVariableBuffer
 	void ReadJsonObject(const rapidjson::Value& jsonValue);
 
 	static constexpr const char* KEY_BUFFER_NAME = "bufferName";
-	static constexpr const char* KEY_BUFFER_SIZE = "bufferSize";
+	static constexpr const char* KEY_BUFFER_BYTE_SIZE = "bufferByteSize";
 	static constexpr const char* KEY_BUFFER = "buffer";
 	static constexpr const char* KEY_REG_SPACE = "registerSpace";
 	static constexpr const char* KEY_REG_NUM = "registerNumber";

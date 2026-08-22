@@ -1,5 +1,55 @@
 #include "ShaderInfo.h"
 
+uint32_t GlobalVariableType::GetByteSize() const
+{
+	// format 크기 * elements
+	return GetFormatByteSize() * elementsCnt;
+}
+
+
+uint32_t GlobalVariableType::GetFormatByteSize() const
+{
+	// format 크기
+	switch (format)
+	{
+	// 2 Byte 
+	case FORMAT::R16_FLOAT:
+		return 2;
+
+	// 4 Byte
+	case FORMAT::R32_INT:
+	case FORMAT::R32_UINT:
+	case FORMAT::R32_FLOAT:
+	case FORMAT::R16G16_FLOAT:
+	case FORMAT::R16G16_UNORM:
+	case FORMAT::R8G8B8A8_UNORM:
+		return 4;
+
+	// 8 Byte 
+	case FORMAT::R32G32_FLOAT:
+	case FORMAT::R16G16B16A16_FLOAT:
+	case FORMAT::R16G16B16A16_UNORM:
+		return 8;
+
+	// 12 Byte
+	case FORMAT::R32G32B32_INT:
+	case FORMAT::R32G32B32_UINT:
+	case FORMAT::R32G32B32_FLOAT:
+		return 12;
+
+	// 16 Byte 
+	case FORMAT::R32G32B32A32_FLOAT:
+		return 16;
+
+	// 64 Byte
+	case FORMAT::MATRIX4X4:
+		return 64;
+
+	default:
+		return 0;
+	}
+}
+
 /*
  현재 개별 구조체 read 부분에 jsonValue 맴버 존재 여부 예외 케이스 assert 안해둔 상태임
  MJassert 개발 되는데로 바로 적용해줘야함! (적용 후 글 삭제 필수!)
@@ -366,26 +416,95 @@ void ShaderIOLayoutElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 
 }
 
-void GlobalVariableElement::WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const
+void GlobalVariableType::WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const
 {
 	writer.StartObject();
 	
-	writer.Key(KEY_VARIABLE_NAME);
-	writer.String(variableName.c_str());
+	writer.Key(KEY_VARIABLE_CLASS);
+	writer.Uint(static_cast<unsigned int>(variableClass));
 
 	writer.Key(KEY_FORMAT);
 	writer.Uint(static_cast<unsigned int>(format));
 
-	writer.Key(KEY_OFFSET);
-	writer.Uint(static_cast<unsigned int>(offset));
-
-	writer.Key(KEY_SIZE);
-	writer.Uint(static_cast<unsigned int>(size));
+	writer.Key(KEY_ELEMENTS_CNT);
+	writer.Uint(static_cast<unsigned int>(elementsCnt));
 
 	writer.EndObject();
 }
 
-void GlobalVariableElement::ReadJsonObject(const rapidjson::Value& jsonValue)
+void GlobalVariableType::ReadJsonObject(const rapidjson::Value& jsonValue)
+{
+
+	if (!jsonValue.IsObject())
+	{
+		if (jsonValue.IsArray())
+			assert(false && "shader jsonValue read fail - jsonValue type: Array! (Object type required) | ShaderInfo.cpp-GlobalVariableElement Read");
+		else if (jsonValue.IsNull())
+			assert(false && "shader jsonValue read fail - jsonValue is Null! | ShaderInfo.cpp-GlobalVariableElement Read");
+		else
+			assert(false && "shader jsonValue read fail - jsonValue type is not Object (Object type required) | ShaderInfo.cpp-GlobalVariableElement Read");
+	}
+
+	if (jsonValue.HasMember(KEY_FORMAT))
+	{
+		format = static_cast<FORMAT>(jsonValue[KEY_FORMAT].GetUint());
+	}
+	else
+	{
+
+	}
+
+	if (jsonValue.HasMember(KEY_VARIABLE_CLASS))
+	{
+		variableClass = static_cast<VARIABLE_CLASS>(jsonValue[KEY_VARIABLE_CLASS].GetUint());
+	}
+	else
+	{
+
+	}
+
+
+	if (jsonValue.HasMember(KEY_ELEMENTS_CNT))
+	{
+		elementsCnt = static_cast<uint32_t>(jsonValue[KEY_ELEMENTS_CNT].GetUint());
+	}
+	else
+	{
+
+	}
+}
+
+void GlobalVariable::WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const
+{
+	writer.StartObject();
+
+	writer.Key(KEY_VARIABLE_NAME);
+	writer.String(variableName.c_str());
+
+	writer.Key(KEY_BASE_OFFSET);
+	writer.Uint(static_cast<unsigned int>(baseOffset));
+
+	writer.Key(KEY_OFFSET);
+	writer.Uint(static_cast<unsigned int>(offset));
+
+	writer.Key(KEY_BYTE_SIZE);
+	writer.Uint(static_cast<unsigned int>(byteSize));
+
+	writer.Key(KEY_VARIABLE_TYPE);
+	variableType.WriteJsonObject(writer);
+
+	writer.Key(KEY_VARIABLE_MEMBERS);
+	writer.StartArray();
+	for (const auto& element : members)
+	{
+		element.WriteJsonObject(writer);
+	}
+	writer.EndArray();
+
+	writer.EndObject();
+}
+
+void GlobalVariable::ReadJsonObject(const rapidjson::Value& jsonValue)
 {
 
 	if (!jsonValue.IsObject())
@@ -407,14 +526,15 @@ void GlobalVariableElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 
 	}
 
-	if (jsonValue.HasMember(KEY_FORMAT))
+	if (jsonValue.HasMember(KEY_BASE_OFFSET))
 	{
-		format = static_cast<FORMAT>(jsonValue[KEY_FORMAT].GetUint());
+		baseOffset = static_cast<uint32_t>(jsonValue[KEY_BASE_OFFSET].GetUint());
 	}
 	else
 	{
 
 	}
+
 
 	if (jsonValue.HasMember(KEY_OFFSET))
 	{
@@ -425,14 +545,43 @@ void GlobalVariableElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 
 	}
 
-	if (jsonValue.HasMember(KEY_SIZE))
+	if (jsonValue.HasMember(KEY_BYTE_SIZE))
 	{
-		size = static_cast<uint32_t>(jsonValue[KEY_SIZE].GetUint());
+		byteSize = static_cast<uint32_t>(jsonValue[KEY_BYTE_SIZE].GetUint());
 	}
 	else
 	{
 
 	}
+
+	if (jsonValue.HasMember(KEY_VARIABLE_TYPE))
+	{
+		const auto& objJson = jsonValue[KEY_VARIABLE_TYPE].GetObject();
+		variableType.ReadJsonObject(objJson);
+	}
+	else
+	{
+
+	}
+
+	if (jsonValue.HasMember(KEY_VARIABLE_MEMBERS))
+	{
+		members.clear();
+		const auto& arr = jsonValue[KEY_VARIABLE_MEMBERS].GetArray();
+		size_t bufferSize = arr.Size();
+		for (size_t i = 0; i < bufferSize; i++)
+		{
+			GlobalVariable element;
+			element.ReadJsonObject(arr[i]);
+			members.push_back(element);
+		}
+	}
+	else
+	{
+
+	}
+
+
 }
 
 void GlobalVariableBuffer::WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const
@@ -442,12 +591,12 @@ void GlobalVariableBuffer::WriteJsonObject(rapidjson::Writer<rapidjson::StringBu
 	writer.Key(KEY_BUFFER_NAME);
 	writer.String(bufferName.c_str());
 
-	writer.Key(KEY_BUFFER_SIZE);
-	writer.Uint(static_cast<unsigned int>(buffer.size()));
+	writer.Key(KEY_BUFFER_BYTE_SIZE);
+	writer.Uint(static_cast<unsigned int>(bufferByteSize));
 
 	writer.Key(KEY_BUFFER);
 	writer.StartArray();
-	for (const auto& element : buffer)
+	for (const auto& element : variables)
 	{
 		element.WriteJsonObject(writer);
 	}
@@ -490,17 +639,26 @@ void GlobalVariableBuffer::ReadJsonObject(const rapidjson::Value& jsonValue)
 
 	}
 
+	if (jsonValue.HasMember(KEY_BUFFER_BYTE_SIZE))
+	{
+		bufferByteSize = static_cast<size_t>(jsonValue[KEY_BUFFER_BYTE_SIZE].GetUint());
+	}
+	else
+	{
+
+	}
+
 
 	if (jsonValue.HasMember(KEY_BUFFER) && jsonValue[KEY_BUFFER].IsArray())
 	{
-		buffer.clear();
+		variables.clear();
 		const auto& arr = jsonValue[KEY_BUFFER].GetArray();
-		bufferSize = arr.Size();
-		for (int i = 0; i < bufferSize; i++)
+		size_t bufferSize = arr.Size();
+		for (size_t i = 0; i < bufferSize; i++)
 		{
-			GlobalVariableElement element;
+			GlobalVariable element;
 			element.ReadJsonObject(arr[i]);
-			buffer.push_back(element);
+			variables.push_back(element);
 		}
 	}
 	else

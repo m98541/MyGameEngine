@@ -5,8 +5,12 @@
 
 #include <vector>
 
-PipeLineStage D3D11VersionToPipeLineStage(D3D11_SHADER_VERSION_TYPE version);
+PipeLineStage D3D11VersionToPipeLineStage(const D3D11_SHADER_VERSION_TYPE& version);
+FORMAT D3D11TypeToVariableFormat(const D3D11_SHADER_TYPE_DESC& shaderTypeDesc);
+VARIABLE_CLASS D3D11ClassTOVariableClass(const D3D_SHADER_VARIABLE_CLASS& typeClass);
 
+GlobalVariable ExtractVariableInfo(ID3D11ShaderReflectionVariable* d3dVariableReflection);
+GlobalVariable TraverseVariableMember(const char* memberName, ID3D11ShaderReflectionType* d3dVariableTypeReflection, const uint32_t baseOffset);
 ShaderInfo D3D11Compiler::ShaderCompile(
 	const wchar_t* hlslFilePath,
 	const char* entryPoint,
@@ -76,8 +80,55 @@ void D3D11Compiler::ShaderReflection()
 void D3D11Compiler::ConstantBufferReflection(D3D11_SHADER_DESC& orgD3D11ShaderDESC)
 {
 	m_shaderInfoDesc.constantBuffersCnt = orgD3D11ShaderDESC.ConstantBuffers;
+	ID3D11ShaderReflectionConstantBuffer* cbReflection = nullptr;
+	ID3D11ShaderReflectionVariable* cbVariableReflection = nullptr;
+	ID3D11ShaderReflectionType* cbVariableTypeReflection = nullptr;
+
+	m_shaderInfo.m_constantBuffers.reserve(m_shaderInfoDesc.constantBuffersCnt);
+	m_shaderInfo.m_constantBuffers.resize(m_shaderInfoDesc.constantBuffersCnt);
+	for (uint32_t i = 0; i < m_shaderInfoDesc.constantBuffersCnt; i++)
+	{
+		D3D11_SHADER_BUFFER_DESC cbBufferDesc = {};
+		cbReflection = m_reflectSource->GetConstantBufferByIndex(i);
+		cbReflection->GetDesc(&cbBufferDesc);
+
+		m_shaderInfo.m_constantBuffers[i].bufferName = cbBufferDesc.Name;
+		m_shaderInfo.m_constantBuffers[i].bufferByteSize = cbBufferDesc.Size;
+		
+
+		//해당 과정에 대하여 리프 노드의 scalar 변수까지 추적하는 재귀적 과정 필요...
+		m_shaderInfo.m_constantBuffers[i].variables.reserve(cbBufferDesc.Variables);
+		m_shaderInfo.m_constantBuffers[i].variables.resize(cbBufferDesc.Variables);
+		for (uint32_t j = 0; j < cbBufferDesc.Variables; j++)
+		{
+			cbVariableReflection = cbReflection->GetVariableByIndex(j);
+			
+			D3D11_SHADER_VARIABLE_DESC cbVariableDesc = {};
+			cbVariableReflection->GetDesc(&cbVariableDesc);
+
+			m_shaderInfo.m_constantBuffers[i].variables[j].variableName = cbVariableDesc.Name;
+			m_shaderInfo.m_constantBuffers[i].variables[j].offset = cbVariableDesc.StartOffset;
+			m_shaderInfo.m_constantBuffers[i].variables[j].byteSize = cbVariableDesc.Size;
+
+			cbVariableTypeReflection = cbVariableReflection->GetType();
+			D3D11_SHADER_TYPE_DESC cbVariableTypeDesc = {};
+			cbVariableTypeReflection->GetDesc(&cbVariableTypeDesc);
+
+			/*
+				단일 변수 , 구조체 , 배열 타입별 
+				각각의 read 방식 구현
+			
+			*/
+
+			
+		}
+
+
+	}
 
 }
+
+
 
 
 
@@ -97,6 +148,9 @@ void D3D11Compiler::ResourceBindingReflection(D3D11_SHADER_DESC& orgD3D11ShaderD
 	std::vector<D3D11_SHADER_INPUT_BIND_DESC> textureInputDesc;
 	std::vector<D3D11_SHADER_INPUT_BIND_DESC> samplerInputDesc;
 
+	// 상수버퍼 바인딩 요구 데이터 추출용(이름 바인딩 시작 오프셋 등 정보 추출위해 필요)
+	std::vector<D3D11_SHADER_INPUT_BIND_DESC> constantBufferDesc;
+
 	for (size_t i = 0; i < resourceInfoCnt; i++)
 	{
 		D3D11_SHADER_INPUT_BIND_DESC inputBindDesc;
@@ -110,11 +164,21 @@ void D3D11Compiler::ResourceBindingReflection(D3D11_SHADER_DESC& orgD3D11ShaderD
 		case D3D_SIT_SAMPLER:
 			samplerInputDesc.push_back(inputBindDesc);
 			break;
+		case D3D_SIT_CBUFFER:
+			constantBufferDesc.push_back(inputBindDesc);
 		default:
 			break;
 		}
 	}
-	
+	/*
+	ConstantBufferReflection 에서의 
+	orgD3D11ShaderDESC.ConstantBuffers 과
+	위에서는 constantBufferDesc.size() 는 동일함을 보장할 수 있는가?
+	*/
+
+	// 음..... 일단 최종 버퍼에 담긴 갯수로 결국 사용해야 하니 다음이 맞는거 같은데...
+	m_shaderInfoDesc.constantBuffersCnt = constantBufferDesc.size();
+
 	m_shaderInfoDesc.texturesCnt = textureInputDesc.size();
 	m_shaderInfoDesc.samplersCnt = samplerInputDesc.size();
 
@@ -123,9 +187,7 @@ void D3D11Compiler::ResourceBindingReflection(D3D11_SHADER_DESC& orgD3D11ShaderD
 }
 
 
-
-
-PipeLineStage D3D11VersionToPipeLineStage(D3D11_SHADER_VERSION_TYPE version)
+PipeLineStage D3D11VersionToPipeLineStage(const D3D11_SHADER_VERSION_TYPE& version)
 {
 	switch (version)
 	{
@@ -151,4 +213,236 @@ PipeLineStage D3D11VersionToPipeLineStage(D3D11_SHADER_VERSION_TYPE version)
 		// assert! 잘못된 쉐이더 버전 참조 문제... 위 정의된 허용할수 있는 쉐이더 범위 넘어섬
 		break;
 	}
+}
+
+
+FORMAT D3D11TypeToVariableFormat(const D3D11_SHADER_TYPE_DESC& shaderTypeDesc)
+{
+	// 32bit integer format
+	if (shaderTypeDesc.Type == D3D_SVT_INT)
+	{
+		switch (shaderTypeDesc.Columns)
+		{
+		case 1: return FORMAT::R32_INT;
+		case 3: return FORMAT::R32G32B32_INT;
+		default: 
+			//assert! Unknown Columns Integer case 
+			break;
+		}
+	}
+
+	// 32bit unsigned integer format
+	if (shaderTypeDesc.Type == D3D_SVT_UINT)
+	{
+		switch (shaderTypeDesc.Columns)
+		{
+		case 1: return FORMAT::R32_UINT;
+		case 3: return FORMAT::R32G32B32_UINT;
+		default:
+			//assert! Unknown Columns Unsigned Integer case 
+			break;
+		}
+	}
+
+	// 32bit floating point format
+	if (shaderTypeDesc.Type == D3D_SVT_FLOAT && shaderTypeDesc.Rows == 1)
+	{
+		switch (shaderTypeDesc.Columns)
+		{
+		case 1: return FORMAT::R32_FLOAT;
+		case 2: return FORMAT::R32G32_FLOAT;
+		case 3: return FORMAT::R32G32B32_FLOAT;
+		case 4: return FORMAT::R32G32B32A32_FLOAT;
+
+		default:
+			// assert!  Unknown Columns Float case 
+			break;
+		}
+	}
+
+	// 16bit half floating point & short
+	if (shaderTypeDesc.Type == D3D_SVT_FLOAT16)
+	{
+		switch (shaderTypeDesc.Columns)
+		{
+	
+		case 1: return FORMAT::R16_FLOAT;
+		case 2: return FORMAT::R16G16_FLOAT;
+		case 3: return FORMAT::R16G16B16A16_FLOAT;
+		default:
+
+			// assert!  Unknown Columns 16bit Float case 
+			break;
+		}
+	}
+
+	if (shaderTypeDesc.Type == D3D_SVT_UINT16)
+	{
+		switch (shaderTypeDesc.Columns)
+		{
+		case 2: return FORMAT::R16G16_UNORM;
+		case 3: return FORMAT::R16G16B16A16_UNORM;
+		default:
+			// assert!  Unknown Columns 16bit Integer(Short) case 
+			break;
+		}
+	}
+
+	//8bit norm RGBA or BGRA
+	if (shaderTypeDesc.Type == D3D_SVT_UINT8 && shaderTypeDesc.Columns == 3)
+	{
+		return FORMAT::R8G8B8A8_UNORM;
+	}
+	else
+	{
+		// assert!  Unknown Columns 8bit norm RGBA or BGRA case 
+	}
+
+	//matrix 
+	if (shaderTypeDesc.Type == D3D_SVT_FLOAT && shaderTypeDesc.Rows == 4 && shaderTypeDesc.Columns == 4)
+	{
+		return FORMAT::MATRIX4X4;
+	}
+	else
+	{
+		// assert!  Unknown size MATRIX case 
+	}
+
+	// 미지정 타입 사용 assert!
+
+
+}
+
+VARIABLE_CLASS D3D11ClassTOVariableClass(const D3D_SHADER_VARIABLE_CLASS& typeClass)
+{
+	switch (typeClass)
+	{
+	case D3D_SVC_SCALAR: return VARIABLE_CLASS::SCALAR;
+	case D3D_SVC_VECTOR: return VARIABLE_CLASS::VECTOR;
+	case D3D_SVC_MATRIX_ROWS: return VARIABLE_CLASS::MATRIX_ROWS;
+	case D3D_SVC_MATRIX_COLUMNS: return VARIABLE_CLASS::MATRIX_COLUMNS;
+	case D3D_SVC_OBJECT: return VARIABLE_CLASS::OBJECT;
+	case D3D_SVC_STRUCT: return VARIABLE_CLASS::STRUCT;
+	case D3D_SVC_INTERFACE_CLASS: return VARIABLE_CLASS::INTERFACE_CLASS;
+	case D3D_SVC_INTERFACE_POINTER: return VARIABLE_CLASS::INTERFACE_POINTER;
+	default:
+		break;
+	}
+}
+
+GlobalVariable ExtractVariableInfo(ID3D11ShaderReflectionVariable* d3dVariableReflection)
+{
+
+	// 동일 포맷 값인가 아닌가로 지정 scalar , vector , matrix 등은 모두 동일 포맷 변수로 
+	// D3D11TypeToVariableFormat 에 의하여 그 Type 이 결정되어 저장되어짐
+	// 단일 포맷 값이 아닌 struct , class 등은 재귀적인 구조로 다시 SearchVariable 를 호출하여 
+	// 동일 포맷 변수 까지 탐색함 
+	// 즉 Type 으로 leaf 여부를 결정함
+	// 해당 완성된 GlobalVariable 가 만들어져서 최종 반환 될 수 있게 해줘야함 
+	
+	// 최상의 변수 정보 추출 후(Variable 초기 정보 추출)
+	// 하위 탐색을 위한 TraverseVariableMember 호출 이후 최종 변수 담아 반환 해줘야함
+
+	D3D11_SHADER_VARIABLE_DESC varDesc = {};
+	d3dVariableReflection->GetDesc(&varDesc);
+	ID3D11ShaderReflectionType* varReflectionType = d3dVariableReflection->GetType();
+
+	// 최종 반환용 변수 정보
+	GlobalVariable reVariable = {};
+
+	//초기 변수 정보 입력 (D3D11_SHADER_VARIABLE_DESC 기반)
+	reVariable.variableName = varDesc.Name;
+	reVariable.baseOffset = varDesc.StartOffset;
+	reVariable.offset = varDesc.StartOffset;
+	reVariable.byteSize = varDesc.Size;
+	
+	
+	//맴버 정보 추출
+	D3D11_SHADER_TYPE_DESC varTypeDesc;
+	varReflectionType->GetDesc(&varTypeDesc);
+	reVariable.variableType.variableClass = D3D11ClassTOVariableClass(varTypeDesc.Class);
+
+	//아직 CLASS 스펙을 다 이해 못해서 확실한 두가지만 넣음 
+	// 향후 추가될 수 있음....
+	if (reVariable.variableType.variableClass == VARIABLE_CLASS::OBJECT ||
+		reVariable.variableType.variableClass == VARIABLE_CLASS::STRUCT)
+	{
+		reVariable.variableType.format = FORMAT::VOID0;
+		reVariable.variableType.elementsCnt = varTypeDesc.Elements;
+		reVariable.members.resize(varTypeDesc.Members);
+
+		for (int i = 0; i < varTypeDesc.Members; i++)
+		{
+
+			reVariable.members[i] = TraverseVariableMember(
+				varReflectionType->GetMemberTypeName(i),
+				varReflectionType->GetMemberTypeByIndex(i),
+				reVariable.baseOffset);
+		}
+	}
+	else
+	{
+		reVariable.variableType.format = D3D11TypeToVariableFormat(varTypeDesc);
+		reVariable.variableType.elementsCnt = varTypeDesc.Elements;
+		//reVariable.members size 0 상태
+	}
+
+	return reVariable;
+
+}
+
+GlobalVariable TraverseVariableMember(const char* memberName , ID3D11ShaderReflectionType* d3dVariableTypeReflection,const uint32_t baseOffset)
+{
+	// ID3D11ShaderReflectionType 을 받아 하위 구조에 대해 재귀적으로 탐색하여 
+	// 하위 GlobalVariable 을 완성하여 반환
+
+	// 반환용 하위 맴버 정보
+	GlobalVariable reVariable = {};
+	uint32_t totalSize = 0;
+
+	D3D11_SHADER_TYPE_DESC varTypeDesc;
+	d3dVariableTypeReflection->GetDesc(&varTypeDesc);
+
+	//변수 정보 입력 (ID3D11ShaderReflectionType 기반)
+	reVariable.variableName = memberName;
+	reVariable.offset = varTypeDesc.Offset;
+	reVariable.baseOffset = baseOffset;
+	reVariable.variableType.variableClass = D3D11ClassTOVariableClass(varTypeDesc.Class);
+	// 하위 맴버에 대해서는 사이즈 필드에 대한 비활성화
+	reVariable.byteSize = GlobalVariable::INVALID_SIZE;
+
+	// 하위 정보 입력
+	//아직 CLASS 스펙을 다 이해 못해서 확실한 두가지만 넣음 
+	// 향후 추가될 수 있음....
+	/*
+		아마 스펙 누락시 FORMAT 정보 가 없음 
+		->FORMAT 기반으로 동작하는 바이트 사이즈 계산에서 버그 발생할 수 있음
+	*/
+	if (reVariable.variableType.variableClass == VARIABLE_CLASS::OBJECT ||
+		reVariable.variableType.variableClass == VARIABLE_CLASS::STRUCT)
+	{
+		reVariable.variableType.format = FORMAT::VOID0;
+		
+		reVariable.variableType.elementsCnt = (varTypeDesc.Elements > 0) ? varTypeDesc.Elements : 1;
+		reVariable.members.resize(varTypeDesc.Members);
+
+		for (int i = 0; i < varTypeDesc.Members; i++)
+		{
+			reVariable.members[i] = TraverseVariableMember(
+				d3dVariableTypeReflection->GetMemberTypeName(i),
+				d3dVariableTypeReflection->GetMemberTypeByIndex(i),
+				reVariable.baseOffset + reVariable.offset);
+			
+		}
+
+		
+	}
+	else
+	{
+		reVariable.variableType.format = D3D11TypeToVariableFormat(varTypeDesc);
+		reVariable.variableType.elementsCnt = (varTypeDesc.Elements > 0) ? varTypeDesc.Elements : 1;
+		
+		//reVariable.members size 0 상태
+	}
+	return reVariable;
 }
