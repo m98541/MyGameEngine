@@ -3,8 +3,10 @@
 ```text
 다음 프로젝트의 구조화 구성을 위해 다음의 자료를 참조하였습니다.
 게임 엔진 아키텍처 3판,제이슨 그레고리 저자(글) · 박상희 번역
+실용 Direct3D 11 렌더링 & 계산
 유영천(megayuchi) 님의 "나만의 엔진 개발하기" PDF (Renderer 및 구조화 파트 참조)
-Hazel 엔진 구조를 참조하여 제작
+초기 RenderAPI 구성 - Hazel 엔진 구조를 참조하여 제작
+
 https://github.com/TheCherno/Hazel/blob/master/Hazel
 선행 R&D 프로토타입 프로젝트: m98541/CharacterCollisionMapRenderer
 ```
