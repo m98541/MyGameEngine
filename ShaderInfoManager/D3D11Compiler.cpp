@@ -1,21 +1,26 @@
 #include "D3D11Compiler.h"
+#include <dxgi.h>
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <d3d11shader.h>
 
 #include <vector>
+#include <map>
 
 PipeLineStage D3D11VersionToPipeLineStage(const D3D11_SHADER_VERSION_TYPE& version);
 FORMAT D3D11TypeToVariableFormat(const D3D11_SHADER_TYPE_DESC& shaderTypeDesc);
 VARIABLE_CLASS D3D11ClassTOVariableClass(const D3D_SHADER_VARIABLE_CLASS& typeClass);
+DXGI_FORMAT ExtractDxgiFormat(D3D_REGISTER_COMPONENT_TYPE componentType, BYTE mask);
 
 GlobalVariable ExtractVariableInfo(ID3D11ShaderReflectionVariable* d3dVariableReflection);
 GlobalVariable TraverseVariableMember(const char* memberName, ID3D11ShaderReflectionType* d3dVariableTypeReflection, const uint32_t baseOffset);
+
+
 ShaderInfo D3D11Compiler::ShaderCompile(
 	const wchar_t* hlslFilePath,
 	const char* entryPoint,
 	const char* targetProfile,
-	const char* outputBinPath)
+	const wchar_t* outputBinPath)
 {
 	
 	UINT compileFlags = D3DCOMPILE_OPTIMIZATION_LEVEL3;
@@ -44,6 +49,35 @@ ShaderInfo D3D11Compiler::ShaderCompile(
 		//assert! D3DCompileFromFile의 성공 여부
 	}
 
+	//쉐이더 정보 초기화 ... 
+	/*
+		이후 리팩토링 필요함 -> 내일해 이시키야
+		해당 구조가 m_shaderInfo 를 가지고 있는게 아니라
+		매개 변수 형태로 shaderInfo 을 받아서 채워줘고 
+		반환은 성공 여부를 반환 해줘야함...
+	*/
+
+	m_shaderInfo = {};
+	m_shaderInfoDesc = {};
+
+	hr = D3DWriteBlobToFile(
+		m_shaderBlob,
+		outputBinPath,
+		TRUE
+	);
+
+	if (SUCCEEDED(hr))
+	{
+		// shader 정보 주출 
+		ShaderReflection();
+		m_shaderInfo.m_shaderFilePath = hlslFilePath;
+		m_shaderInfo.m_shaderIRFilePath = outputBinPath;
+	}
+	else
+	{
+		//assert! D3DWriteBlobToFile 실패
+	}
+	return m_shaderInfo;
 	
 }
 
@@ -74,17 +108,21 @@ void D3D11Compiler::ShaderReflection()
 		static_cast<D3D11_SHADER_VERSION_TYPE>(orgD3D11ShaderDESC.Version)
 	);
 
+
+	ConstantBufferReflection(orgD3D11ShaderDESC);
+	IoSignatureReflection(orgD3D11ShaderDESC);
+	ResourceBindingReflection(orgD3D11ShaderDESC);
+
 }
 
 //상수 버퍼 정보
 void D3D11Compiler::ConstantBufferReflection(D3D11_SHADER_DESC& orgD3D11ShaderDESC)
 {
+
 	m_shaderInfoDesc.constantBuffersCnt = orgD3D11ShaderDESC.ConstantBuffers;
 	ID3D11ShaderReflectionConstantBuffer* cbReflection = nullptr;
 	ID3D11ShaderReflectionVariable* cbVariableReflection = nullptr;
-	ID3D11ShaderReflectionType* cbVariableTypeReflection = nullptr;
-
-	m_shaderInfo.m_constantBuffers.reserve(m_shaderInfoDesc.constantBuffersCnt);
+	
 	m_shaderInfo.m_constantBuffers.resize(m_shaderInfoDesc.constantBuffersCnt);
 	for (uint32_t i = 0; i < m_shaderInfoDesc.constantBuffersCnt; i++)
 	{
@@ -97,30 +135,12 @@ void D3D11Compiler::ConstantBufferReflection(D3D11_SHADER_DESC& orgD3D11ShaderDE
 		
 
 		//해당 과정에 대하여 리프 노드의 scalar 변수까지 추적하는 재귀적 과정 필요...
-		m_shaderInfo.m_constantBuffers[i].variables.reserve(cbBufferDesc.Variables);
+		
 		m_shaderInfo.m_constantBuffers[i].variables.resize(cbBufferDesc.Variables);
 		for (uint32_t j = 0; j < cbBufferDesc.Variables; j++)
 		{
 			cbVariableReflection = cbReflection->GetVariableByIndex(j);
-			
-			D3D11_SHADER_VARIABLE_DESC cbVariableDesc = {};
-			cbVariableReflection->GetDesc(&cbVariableDesc);
-
-			m_shaderInfo.m_constantBuffers[i].variables[j].variableName = cbVariableDesc.Name;
-			m_shaderInfo.m_constantBuffers[i].variables[j].offset = cbVariableDesc.StartOffset;
-			m_shaderInfo.m_constantBuffers[i].variables[j].byteSize = cbVariableDesc.Size;
-
-			cbVariableTypeReflection = cbVariableReflection->GetType();
-			D3D11_SHADER_TYPE_DESC cbVariableTypeDesc = {};
-			cbVariableTypeReflection->GetDesc(&cbVariableTypeDesc);
-
-			/*
-				단일 변수 , 구조체 , 배열 타입별 
-				각각의 read 방식 구현
-			
-			*/
-
-			
+			m_shaderInfo.m_constantBuffers[i].variables[j] = ExtractVariableInfo(cbVariableReflection);
 		}
 
 
@@ -129,14 +149,46 @@ void D3D11Compiler::ConstantBufferReflection(D3D11_SHADER_DESC& orgD3D11ShaderDE
 }
 
 
-
-
-
 //입출력 서명 정보 
 void D3D11Compiler::IoSignatureReflection(D3D11_SHADER_DESC& orgD3D11ShaderDESC)
 {
 	m_shaderInfoDesc.inputLayoutCnt = orgD3D11ShaderDESC.InputParameters;
 	m_shaderInfoDesc.outLayoutCnt = orgD3D11ShaderDESC.OutputParameters;
+	D3D11_SIGNATURE_PARAMETER_DESC parameterDesc;
+
+	m_shaderInfo.m_inputLayout.reserve(m_shaderInfoDesc.inputLayoutCnt);
+	m_shaderInfo.m_outputLayout.reserve(m_shaderInfoDesc.outLayoutCnt);
+
+	ShaderIOLayoutElement ioLayoutElement = {};
+	for (uint32_t i = 0; i < m_shaderInfoDesc.inputLayoutCnt; i++)
+	{
+		//시스템 내부 변수 전달 값은 제외
+		if (parameterDesc.SystemValueType != D3D_NAME_UNDEFINED)
+			continue;
+
+		m_reflectSource->GetInputParameterDesc(i , &parameterDesc);
+
+		ioLayoutElement.semanticName = parameterDesc.SemanticName;
+		ioLayoutElement.semanticIndex = parameterDesc.SemanticIndex;
+		ioLayoutElement.format = static_cast<uint32_t>(ExtractDxgiFormat(parameterDesc.ComponentType , parameterDesc.Mask));
+
+		m_shaderInfo.m_inputLayout.push_back(ioLayoutElement);
+	}
+
+	for (uint32_t i = 0; i < m_shaderInfoDesc.outLayoutCnt; i++)
+	{
+		if (parameterDesc.SystemValueType != D3D_NAME_UNDEFINED)
+			continue;
+
+		m_reflectSource->GetOutputParameterDesc(i, &parameterDesc);
+		
+		ioLayoutElement.semanticName = parameterDesc.SemanticName;
+		ioLayoutElement.semanticIndex = parameterDesc.SemanticIndex;
+		ioLayoutElement.format = static_cast<uint32_t>(ExtractDxgiFormat(parameterDesc.ComponentType, parameterDesc.Mask));
+
+		m_shaderInfo.m_outputLayout.push_back(ioLayoutElement);
+	}
+	
 
 }
 
@@ -145,27 +197,36 @@ void D3D11Compiler::ResourceBindingReflection(D3D11_SHADER_DESC& orgD3D11ShaderD
 {
 	size_t resourceInfoCnt = orgD3D11ShaderDESC.BoundResources;
 
-	std::vector<D3D11_SHADER_INPUT_BIND_DESC> textureInputDesc;
-	std::vector<D3D11_SHADER_INPUT_BIND_DESC> samplerInputDesc;
+	
 
 	// 상수버퍼 바인딩 요구 데이터 추출용(이름 바인딩 시작 오프셋 등 정보 추출위해 필요)
-	std::vector<D3D11_SHADER_INPUT_BIND_DESC> constantBufferDesc;
+	std::map<std::string, D3D11_SHADER_INPUT_BIND_DESC> constantBufferDescMap;
 
 	for (size_t i = 0; i < resourceInfoCnt; i++)
 	{
 		D3D11_SHADER_INPUT_BIND_DESC inputBindDesc;
 		m_reflectSource->GetResourceBindingDesc(i , &inputBindDesc);
+		ResourceBindingElement element;
 
+		if (inputBindDesc.Type == D3D_SIT_TEXTURE || inputBindDesc.Type == D3D_SIT_SAMPLER)
+		{
+			element = {};
+			element.resourceType = inputBindDesc.Type;
+			element.resourceName = inputBindDesc.Name;
+			element.regNum = inputBindDesc.BindPoint;
+			element.bindingCount = inputBindDesc.BindCount;
+		}
 		switch (inputBindDesc.Type)
 		{
 		case D3D_SIT_TEXTURE:
-			textureInputDesc.push_back(inputBindDesc);
+			m_shaderInfo.m_textures.push_back(element);
 			break;
 		case D3D_SIT_SAMPLER:
-			samplerInputDesc.push_back(inputBindDesc);
+			m_shaderInfo.m_samplers.push_back(element);
 			break;
 		case D3D_SIT_CBUFFER:
-			constantBufferDesc.push_back(inputBindDesc);
+			constantBufferDescMap[inputBindDesc.Name] = inputBindDesc;
+			break;
 		default:
 			break;
 		}
@@ -177,10 +238,25 @@ void D3D11Compiler::ResourceBindingReflection(D3D11_SHADER_DESC& orgD3D11ShaderD
 	*/
 
 	// 음..... 일단 최종 버퍼에 담긴 갯수로 결국 사용해야 하니 다음이 맞는거 같은데...
-	m_shaderInfoDesc.constantBuffersCnt = constantBufferDesc.size();
+	m_shaderInfoDesc.constantBuffersCnt = constantBufferDescMap.size();
+	m_shaderInfoDesc.texturesCnt = m_shaderInfo.m_textures.size();
+	m_shaderInfoDesc.samplersCnt = m_shaderInfo.m_samplers.size();
 
-	m_shaderInfoDesc.texturesCnt = textureInputDesc.size();
-	m_shaderInfoDesc.samplersCnt = samplerInputDesc.size();
+	for (auto& cb : m_shaderInfo.m_constantBuffers)
+	{
+		//타입정보의 경우 D3D_SIT_CBUFFER임이 확실함으로 저장 X
+		auto bindInfo = constantBufferDescMap.find(cb.bufferName);
+		if (bindInfo != constantBufferDescMap.end())
+		{
+			cb.regNum = bindInfo->second.BindPoint;
+			cb.bindingCount = bindInfo->second.BindCount;
+		}
+		else
+		{
+			// bufferName이 존재하지 않는 경우 0 이나 NULL 사용 X(0 부터 시작... 끝값이 안전)
+			cb.regNum = 0xFF;
+		}
+	}
 
 
 
@@ -205,9 +281,6 @@ PipeLineStage D3D11VersionToPipeLineStage(const D3D11_SHADER_VERSION_TYPE& versi
 
 	case D3D11_SHVER_PIXEL_SHADER:
 		return PipeLineStage::Pixel;
-
-	case D3D11_SHVER_COMPUTE_SHADER:
-		return PipeLineStage::Compute;
 
 	default:
 		// assert! 잘못된 쉐이더 버전 참조 문제... 위 정의된 허용할수 있는 쉐이더 범위 넘어섬
@@ -383,7 +456,7 @@ GlobalVariable ExtractVariableInfo(ID3D11ShaderReflectionVariable* d3dVariableRe
 	else
 	{
 		reVariable.variableType.format = D3D11TypeToVariableFormat(varTypeDesc);
-		reVariable.variableType.elementsCnt = varTypeDesc.Elements;
+		reVariable.variableType.elementsCnt = (varTypeDesc.Elements > 0) ? varTypeDesc.Elements : 1;
 		//reVariable.members size 0 상태
 	}
 
@@ -445,4 +518,52 @@ GlobalVariable TraverseVariableMember(const char* memberName , ID3D11ShaderRefle
 		//reVariable.members size 0 상태
 	}
 	return reVariable;
+}
+
+
+DXGI_FORMAT ExtractDxgiFormat(D3D_REGISTER_COMPONENT_TYPE componentType, BYTE mask)
+{
+	// Mask의 하위 4비트만 사용 (x=1, y=2, z=4, w=8)
+	BYTE componentMask = mask & 0x0F;
+
+	switch (componentType)
+	{
+	case D3D_REGISTER_COMPONENT_FLOAT32:
+		if (componentMask <= 0x01)      // x
+			return DXGI_FORMAT_R32_FLOAT;
+		else if (componentMask <= 0x03) // xy
+			return DXGI_FORMAT_R32G32_FLOAT;
+		else if (componentMask <= 0x07) // xyz
+			return DXGI_FORMAT_R32G32B32_FLOAT;
+		else if (componentMask <= 0x0F) // xyzw
+			return DXGI_FORMAT_R32G32B32A32_FLOAT;
+		break;
+
+	case D3D_REGISTER_COMPONENT_UINT32:
+		if (componentMask <= 0x01)
+			return DXGI_FORMAT_R32_UINT;
+		else if (componentMask <= 0x03)
+			return DXGI_FORMAT_R32G32_UINT;
+		else if (componentMask <= 0x07)
+			return DXGI_FORMAT_R32G32B32_UINT;
+		else if (componentMask <= 0x0F)
+			return DXGI_FORMAT_R32G32B32A32_UINT;
+		break;
+
+	case D3D_REGISTER_COMPONENT_SINT32:
+		if (componentMask <= 0x01)
+			return DXGI_FORMAT_R32_SINT;
+		else if (componentMask <= 0x03)
+			return DXGI_FORMAT_R32G32_SINT;
+		else if (componentMask <= 0x07)
+			return DXGI_FORMAT_R32G32B32_SINT;
+		else if (componentMask <= 0x0F)
+			return DXGI_FORMAT_R32G32B32A32_SINT;
+		break;
+
+	default:
+		break;
+	}
+
+	return DXGI_FORMAT_UNKNOWN;
 }

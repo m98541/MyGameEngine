@@ -341,7 +341,7 @@ void ShaderIOLayoutElement::WriteJsonObject(rapidjson::Writer<rapidjson::StringB
 	writer.Uint(static_cast<unsigned int>(format));
 	
 	writer.Key(KEY_NAME);
-	writer.String(name.c_str());
+	writer.String(semanticName.c_str());
 
 	writer.Key(KEY_SYSTEM_VALUE);
 	writer.Bool(systemValue);
@@ -369,7 +369,7 @@ void ShaderIOLayoutElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 
 	if (jsonValue.HasMember(KEY_FORMAT))
 	{
-		format = static_cast<FORMAT>(jsonValue[KEY_FORMAT].GetUint());
+		format = static_cast<uint32_t>(jsonValue[KEY_FORMAT].GetUint());
 	}
 	else
 	{
@@ -378,7 +378,7 @@ void ShaderIOLayoutElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 
 	if (jsonValue.HasMember(KEY_NAME))
 	{
-		name = jsonValue[KEY_NAME].GetString();
+		semanticName = jsonValue[KEY_NAME].GetString();
 	}
 	else
 	{
@@ -614,6 +614,9 @@ void GlobalVariableBuffer::WriteJsonObject(rapidjson::Writer<rapidjson::StringBu
 
 	writer.Key(KEY_BINDING);
 	writer.Uint(static_cast<unsigned int>(binding));
+
+	writer.Key(KEY_BINDING_COUNT);
+	writer.Uint(static_cast<unsigned int>(bindingCount));
 	
 	writer.EndObject();
 }
@@ -702,7 +705,14 @@ void GlobalVariableBuffer::ReadJsonObject(const rapidjson::Value& jsonValue)
 
 	}
 
+	if (jsonValue.HasMember(KEY_BINDING_COUNT))
+	{
+		binding = static_cast<uint32_t>(jsonValue[KEY_BINDING_COUNT].GetUint());
+	}
+	else
+	{
 
+	}
 
 }
 
@@ -712,6 +722,9 @@ void ResourceBindingElement::WriteJsonObject(rapidjson::Writer<rapidjson::String
 
 	writer.Key(KEY_RESOURCE_NAME);
 	writer.String(resourceName.c_str());
+
+	writer.Key(KEY_RESOURCE_TYPE);
+	writer.Uint(static_cast<unsigned int>(resourceType));
 
 	writer.Key(KEY_REG_SPACE);
 	writer.Uint(static_cast<unsigned int>(registerSpace));
@@ -725,6 +738,12 @@ void ResourceBindingElement::WriteJsonObject(rapidjson::Writer<rapidjson::String
 
 	writer.Key(KEY_BINDING);
 	writer.Uint(static_cast<unsigned int>(binding));
+
+	writer.Key(KEY_DIMENSION);
+	writer.Uint(static_cast<unsigned int>(dimension));
+
+	writer.Key(KEY_BINDING_COUNT);
+	writer.Uint(static_cast<unsigned int>(bindingCount));
 
 	writer.EndObject();
 }
@@ -744,6 +763,15 @@ void ResourceBindingElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 	if (jsonValue.HasMember(KEY_RESOURCE_NAME))
 	{
 		resourceName = jsonValue[KEY_RESOURCE_NAME].GetString();
+	}
+	else
+	{
+
+	}
+
+	if (jsonValue.HasMember(KEY_RESOURCE_TYPE))
+	{
+		resourceType = static_cast<uint8_t>(jsonValue[KEY_RESOURCE_TYPE].GetUint());
 	}
 	else
 	{
@@ -780,6 +808,24 @@ void ResourceBindingElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 	if (jsonValue.HasMember(KEY_BINDING))
 	{
 		binding = static_cast<uint8_t>(jsonValue[KEY_BINDING].GetUint());
+	}
+	else
+	{
+
+	}
+
+	if (jsonValue.HasMember(KEY_DIMENSION))
+	{
+		dimension = static_cast<uint8_t>(jsonValue[KEY_DIMENSION].GetUint());
+	}
+	else
+	{
+
+	}
+
+	if (jsonValue.HasMember(KEY_BINDING_COUNT))
+	{
+		binding = static_cast<uint32_t>(jsonValue[KEY_BINDING_COUNT].GetUint());
 	}
 	else
 	{

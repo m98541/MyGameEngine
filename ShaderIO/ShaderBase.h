@@ -95,7 +95,7 @@ enum class FORMAT : uint8_t
 
 };
 
-constexpr size_t GRAPHICS_STAGE_COUNT = 6;
+constexpr size_t GRAPHICS_STAGE_COUNT = 5;
 
 enum class PipeLineStage
 {
@@ -105,8 +105,7 @@ enum class PipeLineStage
 	Hull, // GLSL 기준 Tessellation Control 
 	Domain, // GLSL 기준 Tessellation Evaluation 
 	Geometry, 
-	Pixel, // GLSL 기준 Fragment
-	Compute
+	Pixel // GLSL 기준 Fragment
 };
 
 enum class ShaderProfileVersion :uint8_t

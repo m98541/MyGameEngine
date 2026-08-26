@@ -23,7 +23,7 @@ public:
 		const wchar_t* hlslFilePath,
 		const char* entryPoint,
 		const char* targetProfile,
-		const char* outputBinPath
+		const wchar_t* outputBinPath
 	) override;
 
 	void ShaderReflection();

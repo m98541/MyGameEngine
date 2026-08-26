@@ -20,7 +20,7 @@ public:
 		const wchar_t* hlslFilePath,
 		const char* entryPoint,
 		const char* targetProfile,
-		const char* outputBinPath
+		const wchar_t* outputBinPath
 	) = 0;
 	
 	static MJEngine::ScopePtr<ShaderCompiler> Create();
