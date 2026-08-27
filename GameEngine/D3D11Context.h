@@ -17,8 +17,10 @@ struct IDXGISwapChain;
 struct IDXGIFactory1;
 struct IDXGIAdapter1;
 //HWND의 경우 구조체가 아닌 typedef 된 핸들 타입임으로
-//위처럼 전방 선언 안됨 아래와 같이 typedef 필요
-typedef void* HWND;
+//추가적으로 다음과 같이 typedef 전방선언의 경우 
+//실제 Windows API가 사용하는 것과 정확히 동일한 구조체 포인터 방식으로 선언해야함
+struct HWND__;
+typedef HWND__* HWND;
 
 // DESC 가 있지만 이걸 직접 외부 전달은X 
 // DisplayAdapterInfo을 통해 필요정보..->넘버, 장치명 ,메모리 크기 정도만 외부 전달 

@@ -1,4 +1,6 @@
 #include "ShaderInfo.h"
+#include <codecvt>
+#include <locale>
 
 uint32_t GlobalVariableType::GetByteSize() const
 {
@@ -108,7 +110,6 @@ void ShaderInfo::WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& wri
 
 	writer.Key(KEY_TARGET_PROFILE_VERSION);
 	writer.Uint(static_cast<unsigned int>(m_targetProfileVersion));
-
 
 	writer.Key(KEY_ENTRY_POINT);
 	writer.String(m_entryPoint.c_str());

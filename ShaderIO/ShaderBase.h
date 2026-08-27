@@ -101,6 +101,7 @@ enum class PipeLineStage
 {
 	// HLSL 기준으로 작성 GLSL 에서는  
 	// 아래의 주석 기준으로 엔진 GLSL 쉐이더 적용부에서 헬퍼함수로 만들어 주어야 함
+	Unknown = 0,
 	Vertex,
 	Hull, // GLSL 기준 Tessellation Control 
 	Domain, // GLSL 기준 Tessellation Evaluation 

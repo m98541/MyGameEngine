@@ -189,15 +189,15 @@ struct ShaderInfo
 
 	ShaderProfileVersion m_targetProfileVersion;
 
-	std::wstring m_entryPoint;
-	std::wstring m_shaderFilePath;
+	std::string m_entryPoint;
+	std::string m_shaderFilePath;
 	// 중간 표현 파일 경로 쉐이더 관리 툴에서 컴파일 후 해당 경로 저장
 	/*
 		이후 관리과정에서
 		쉐이더 저장과 컴파일 저장을 분리하면 불일치 문제가 발생 할 수 있음
 		쉐이더의 경우 등록(업데이트)와 동시에 컴파일 되어 지정되어야함
 	*/
-	std::wstring m_shaderIRFilePath;
+	std::string m_shaderIRFilePath;
 
 	void WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const;
 	void ReadJsonObject(const rapidjson::Value& jsonValue);

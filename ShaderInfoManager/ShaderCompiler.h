@@ -16,11 +16,13 @@ private:
 public:
 	~ShaderCompiler() = default;
 
-	virtual ShaderInfo ShaderCompile(
+	virtual bool ShaderCompile(
 		const wchar_t* hlslFilePath,
 		const char* entryPoint,
 		const char* targetProfile,
-		const wchar_t* outputBinPath
+		const wchar_t* outputBinPath,
+		ShaderInfo& shaderInfo,
+		ShaderInfoDesc& shaderInfoDesc
 	) = 0;
 	
 	static MJEngine::ScopePtr<ShaderCompiler> Create();
