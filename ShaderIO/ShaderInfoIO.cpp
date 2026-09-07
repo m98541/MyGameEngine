@@ -88,9 +88,9 @@ void ShaderInfoIO::WriteShaderInfo(const char* jsonFileName, const char* jsonFil
 
 
 
-const std::vector<std::string> ShaderInfoIO::GetShaderIdList()const
+const eastl::vector<eastl::string> ShaderInfoIO::GetShaderIdList()const
 {
-	std::vector<std::string> re = {};
+	eastl::vector<eastl::string> re = {};
 
 	for (const auto& shaderInfo : m_shaderMap)
 	{
@@ -100,7 +100,7 @@ const std::vector<std::string> ShaderInfoIO::GetShaderIdList()const
 	return re;
 }
 
-bool ShaderInfoIO::FindShader(std::string id, ShaderInfo& outShader)const
+bool ShaderInfoIO::FindShader(eastl::string id, ShaderInfo& outShader)const
 {
 	auto shader = m_shaderMap.find(id);
 
@@ -116,12 +116,12 @@ bool ShaderInfoIO::FindShader(std::string id, ShaderInfo& outShader)const
 
 }
 
-void ShaderInfoIO::SetShader(std::string id, ShaderInfo element)
+void ShaderInfoIO::SetShader(eastl::string id, ShaderInfo element)
 {
 	m_shaderMap[id] = element;
 }
 
-void ShaderInfoIO::DeleteShader(std::string id)
+void ShaderInfoIO::DeleteShader(eastl::string id)
 {
 	m_shaderMap.erase(id);
 }

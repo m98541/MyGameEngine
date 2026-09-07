@@ -1,8 +1,8 @@
 #ifndef SHADER_INFO_H
 #define SHADER_INFO_H
 
-#include <string>
-#include <vector>
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
 
 #include <rapidjson/document.h>
 
@@ -36,7 +36,7 @@ struct ShaderIOLayoutElement
 	bool systemValue = false; // SV_Position, gl_Position 같은 시스템 정의 값
 
 	//HLSL 용 필드
-	std::string semanticName;
+	eastl::string semanticName;
 	uint32_t semanticIndex = 0;
 	uint32_t format = 0; // 다음은 FORMAT에 정의된 format 이 아닌 dxgi 포맷을 그대로 전달함
 
@@ -80,12 +80,12 @@ struct GlobalVariableType
 
 struct GlobalVariable
 {	
-	std::string variableName;
+	eastl::string variableName;
 	uint32_t baseOffset = 0;// 부모의 시작 offset
 	uint32_t offset = 0;
 	uint32_t byteSize = 0;
 	GlobalVariableType variableType;
-	std::vector<GlobalVariable> members; // scalar 인경우 size 0 호출 자체 X
+	eastl::vector<GlobalVariable> members; // scalar 인경우 size 0 호출 자체 X
 
 	// 최상의 변수만이 사이즈를 가질 수 있음 
 	// 하부 구조적인 변수에 대해서는 사이즈 필드에 대해 비활성화 
@@ -107,9 +107,9 @@ struct GlobalVariable
 
 struct GlobalVariableBuffer
 {
-	std::string bufferName;
+	eastl::string bufferName;
 	uint32_t bufferByteSize = 0;
-	std::vector<GlobalVariable> variables;
+	eastl::vector<GlobalVariable> variables;
 
 	//HLSL 
 	uint8_t registerSpace = 0;// Dx12 Dx11의 경우 0으로 고정
@@ -135,7 +135,7 @@ struct GlobalVariableBuffer
 
 struct ResourceBindingElement
 {
-	std::string resourceName;
+	eastl::string resourceName;
 
 	// HLSL
 	uint8_t registerSpace = 0; 
@@ -174,30 +174,30 @@ struct ShaderInfoDesc
 
 struct ShaderInfo
 {
-	std::string m_id;
+	eastl::string m_id;
 	PipeLineStage m_stage;
 
-	std::vector<ShaderIOLayoutElement> m_inputLayout;
-	std::vector<ShaderIOLayoutElement> m_outputLayout;
+	eastl::vector<ShaderIOLayoutElement> m_inputLayout;
+	eastl::vector<ShaderIOLayoutElement> m_outputLayout;
 
 	//HLSL 용 필드
-	std::vector<GlobalVariableBuffer> m_constantBuffers;
+	eastl::vector<GlobalVariableBuffer> m_constantBuffers;
 
-	std::vector<ResourceBindingElement> m_textures;
+	eastl::vector<ResourceBindingElement> m_textures;
 
-	std::vector<ResourceBindingElement> m_samplers;
+	eastl::vector<ResourceBindingElement> m_samplers;
 
 	ShaderProfileVersion m_targetProfileVersion;
 
-	std::string m_entryPoint;
-	std::string m_shaderFilePath;
+	eastl::string m_entryPoint;
+	eastl::string m_shaderFilePath;
 	// 중간 표현 파일 경로 쉐이더 관리 툴에서 컴파일 후 해당 경로 저장
 	/*
 		이후 관리과정에서
 		쉐이더 저장과 컴파일 저장을 분리하면 불일치 문제가 발생 할 수 있음
 		쉐이더의 경우 등록(업데이트)와 동시에 컴파일 되어 지정되어야함
 	*/
-	std::string m_shaderIRFilePath;
+	eastl::string m_shaderIRFilePath;
 
 	void WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const;
 	void ReadJsonObject(const rapidjson::Value& jsonValue);

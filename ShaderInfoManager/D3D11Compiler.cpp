@@ -1,7 +1,7 @@
 #include "D3D11Compiler.h"
 #include <Windows.h>
-#include <vector>
-#include <map>
+#include <EASTL/vector.h>
+#include <EASTL/map.h>
 
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "dxguid.lib")
@@ -14,7 +14,7 @@ DXGI_FORMAT ExtractDxgiFormat(D3D_REGISTER_COMPONENT_TYPE componentType, BYTE ma
 GlobalVariable ExtractVariableInfo(ID3D11ShaderReflectionVariable* d3dVariableReflection);
 GlobalVariable TraverseVariableMember(const char* memberName, ID3D11ShaderReflectionType* d3dVariableTypeReflection, const uint32_t baseOffset);
 
-std::string ToUtf8String(const wchar_t* wStr);
+eastl::string ToUtf8String(const wchar_t* wStr);
 
 bool D3D11Compiler::ShaderCompile(
 	const wchar_t* hlslFilePath,
@@ -200,7 +200,7 @@ void D3D11Compiler::ResourceBindingReflection(ShaderInfo& shaderInfo, ShaderInfo
 	
 
 	// 상수버퍼 바인딩 요구 데이터 추출용(이름 바인딩 시작 오프셋 등 정보 추출위해 필요)
-	std::map<std::string, D3D11_SHADER_INPUT_BIND_DESC> constantBufferDescMap;
+	eastl::map<eastl::string, D3D11_SHADER_INPUT_BIND_DESC> constantBufferDescMap;
 
 	for (size_t i = 0; i < resourceInfoCnt; i++)
 	{
@@ -569,14 +569,14 @@ DXGI_FORMAT ExtractDxgiFormat(D3D_REGISTER_COMPONENT_TYPE componentType, BYTE ma
 	return DXGI_FORMAT_UNKNOWN;
 }
 
-std::string ToUtf8String(const wchar_t* wStr) {
+eastl::string ToUtf8String(const wchar_t* wStr) {
 
 	if (!wStr) return "";
 
 	int size = WideCharToMultiByte(CP_UTF8, 0, wStr, -1, nullptr, 0, nullptr, nullptr);
 	if (size <= 0) return "";
 
-	std::string strTo(size - 1, 0);
+	eastl::string strTo(size - 1, 0);
 
 	WideCharToMultiByte(CP_UTF8, 0, wStr, -1, &strTo[0], size, nullptr, nullptr);
 

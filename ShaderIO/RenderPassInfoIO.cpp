@@ -3,6 +3,7 @@
 #include <iostream>
 #include <experimental/filesystem>
 #include <fstream>
+#include <string>
 void RenderPassInfoIO::ReadRenderPassInfo(const char* jsonFilePath)
 {
 	std::ifstream file(jsonFilePath);
@@ -76,10 +77,10 @@ void RenderPassInfoIO::WriteRenderPassInfo(const char* jsonFileName, const char*
 
 }
 
-const std::vector<std::string> RenderPassInfoIO::GetRenderPassIdList()
+const eastl::vector<eastl::string> RenderPassInfoIO::GetRenderPassIdList()
 const
 {
-	std::vector<std::string> re = {};
+	eastl::vector<eastl::string> re = {};
 
 	for (const auto& renderPassInfo : m_renderPassList)
 	{
@@ -89,7 +90,7 @@ const
 	return re;
 }
 
-bool RenderPassInfoIO::FindRenderPass(std::string id, RenderPassInfo& outRenderPassInfo)
+bool RenderPassInfoIO::FindRenderPass(eastl::string id, RenderPassInfo& outRenderPassInfo)
 const
 {
 	auto renderPass = m_renderPassList.find(id);
@@ -104,12 +105,12 @@ const
 
 }
 
-void RenderPassInfoIO::SetRenderPassMaterialTag(std::string id, std::string materialTag)
+void RenderPassInfoIO::SetRenderPassMaterialTag(eastl::string id, eastl::string materialTag)
 {
 	m_renderPassList[id].materialTag = materialTag;
 }
 
-void RenderPassInfoIO::SetRenderPass(std::string id, RenderPassInfo element)
+void RenderPassInfoIO::SetRenderPass(eastl::string id, RenderPassInfo element)
 {
 	m_renderPassList[id] = element;
 }

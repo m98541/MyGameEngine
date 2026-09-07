@@ -5,6 +5,8 @@
 	* 다음은 엔진에서 사용될 범용 포맷으로 이후
 	* 엔진 내부에 각각의 그래픽 모듈에서 변환 장치 필요함
 */
+#include <EASTL/string.h>
+
 enum class PRIMITIVE_TOPOLOGY : uint8_t
 {
 
@@ -95,8 +97,6 @@ enum class FORMAT : uint8_t
 
 };
 
-constexpr size_t GRAPHICS_STAGE_COUNT = 5;
-
 enum class PipeLineStage
 {
 	// HLSL 기준으로 작성 GLSL 에서는  
@@ -106,8 +106,33 @@ enum class PipeLineStage
 	Hull, // GLSL 기준 Tessellation Control 
 	Domain, // GLSL 기준 Tessellation Evaluation 
 	Geometry, 
-	Pixel // GLSL 기준 Fragment
-};
+	Pixel ,// GLSL 기준 Fragment
+COUNT};
+
+inline size_t PipeLineStageCnt()
+{
+	return static_cast<size_t>(PipeLineStage::COUNT);
+}
+
+inline eastl::string GetPipeLineStageString(PipeLineStage stage)
+{
+	static const eastl::string Vertex = "Vertex";
+	static const eastl::string Hull = "Hull";
+	static const eastl::string Domain = "Domain";
+	static const eastl::string Geometry = "Geometry";
+	static const eastl::string Pixel = "Pixel";
+	static const eastl::string Unknown = "Unknown";
+
+	switch (stage)
+	{
+	case PipeLineStage::Vertex:  return Vertex;
+	case PipeLineStage::Hull:    return Hull; 
+	case PipeLineStage::Domain:  return Domain;
+	case PipeLineStage::Geometry:return Geometry;
+	case PipeLineStage::Pixel:   return Pixel;
+	default: return Unknown;
+	}
+}
 
 enum class ShaderProfileVersion :uint8_t
 {
@@ -120,13 +145,45 @@ enum class ShaderProfileVersion :uint8_t
 	HLSL_6_5,
 	HLSL_6_6,
 
+	/*
 	//GLSL Ver
 	GLSL_330,
 	GLSL_430,//Compute Shader 도입
 	GLSL_450,
 	GLSL_460
-
+	*/
+COUNT
 };
+
+inline size_t ShaderProfileVersionCnt()
+{
+	return static_cast<size_t>(ShaderProfileVersion::COUNT);
+}
+
+inline eastl::string GetShaderProfileVersionString(ShaderProfileVersion version)
+{
+	static const eastl::string Unknown = "Unknown";
+
+	static const eastl::string HLSL_5_0 = "HLSL_5_0";
+
+	static const eastl::string HLSL_5_1 = "HLSL_5_1";
+
+	static const eastl::string HLSL_6_0 = "HLSL_5_0";
+	static const eastl::string HLSL_6_5 = "HLSL_6_5";
+	static const eastl::string HLSL_6_6 = "HLSL_6_6";
+
+	switch (version)
+	{
+	case ShaderProfileVersion::HLSL_5_0: return HLSL_5_0;
+	case ShaderProfileVersion::HLSL_5_1: return HLSL_5_1;
+	case ShaderProfileVersion::HLSL_6_0: return HLSL_6_0;
+	case ShaderProfileVersion::HLSL_6_5: return HLSL_6_5;
+	case ShaderProfileVersion::HLSL_6_6: return HLSL_6_6;
+	default: return Unknown;
+	}
+}
+
+
 
 
 /* 해당 함수는 이후 엔진 내부 쉐이더 Dx 종속 영역 Shader 적옹 부분에서 동작 시킴

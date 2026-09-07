@@ -8,11 +8,11 @@
 
 패스 정보에는 기본적으로 패스 식별을 위한 이름과(+ 식별자가 따로 필요 할듯)
 랜더 순서에 맞춘 ShaderInfo 벡터 필요( 개별 스테이지의 정보는 ShaderInfo 에서 제공해줌 ,세부적인 정보도)
-std::string targetProfileVersion; 는 여기서도 관리(사실상 디버깅 용?)
+eastl::string targetProfileVersion; 는 여기서도 관리(사실상 디버깅 용?)
 패스 검증 기능은 일단 개발자에게 맡기는 방향으로 개발 이후에 차후 개발 필요..
 */
 #include "ShaderInfo.h"
-#include <array>
+#include <EASTL/array.h>
 
 
 /*
@@ -23,7 +23,7 @@ std::string targetProfileVersion; 는 여기서도 관리(사실상 디버깅 �
 */
 struct InputLayoutElement
 {
-	std::string name;
+	eastl::string name;
 	FORMAT format;
 	uint32_t inputSlot = 0;
 	uint32_t alignedByteOffset;
@@ -47,7 +47,7 @@ struct InputLayoutElement
 struct PassInputLayoutContext
 {
 	PRIMITIVE_TOPOLOGY primitiveTopology;
-	std::vector<InputLayoutElement> inputLayout;
+	eastl::vector<InputLayoutElement> inputLayout;
 
 	void WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const;
 	void ReadJsonObject(const rapidjson::Value& jsonValue);
@@ -58,7 +58,7 @@ struct PassInputLayoutContext
 
 struct PassElement
 {
-	std::string shaderId;
+	eastl::string shaderId;
 	PipeLineStage stage;
 	bool isValid;
 	
@@ -73,8 +73,8 @@ struct PassElement
 struct PassCheckResult
 {
 	bool errorFlag = 0; // 에러면 true 아니면 false
-	std::vector<PipeLineStage> errorPipe;
-	std::string errorLog;
+	eastl::vector<PipeLineStage> errorPipe;
+	eastl::string errorLog;
 };
 
 
@@ -89,7 +89,7 @@ public:
 	void DeleteShader(PipeLineStage stage);
 
 	//get 통해서 id 정보 받아 조회 , IsVail 통과시 값 넣고 true 못하면 값 안넣어주고 false 반환
-	bool GetVertexShaderId(PipeLineStage stage, std::string& id)const;
+	bool GetVertexShaderId(PipeLineStage stage, eastl::string& id)const;
 
 	//정말 간단한 패스 검증 기능(일단은 vertex pixel 이 존재 하는지 , Hull 과 Domain 이 함께 있는지 , Layout 규격정보 정도만 검사)
 	PassCheckResult RenderPassCheck() const;
@@ -108,12 +108,12 @@ public:
 	static constexpr const char* KEY_PASS_INPUT_CONTEXT = "passInputContext";
 	static constexpr const char* KEY_PIPELINES = "pipeLines";
 
-	std::string renderPassId;
-	std::string materialTag;
+	eastl::string renderPassId;
+	eastl::string materialTag;
 private:
 
 	PassInputLayoutContext m_passInputContext;
-	std::array<PassElement, GRAPHICS_STAGE_COUNT> m_pipeLines;
+	eastl::array<PassElement, PipeLineStageCnt()> m_pipeLines;
 };
 
 #endif // !RENDERPASSINFO_H

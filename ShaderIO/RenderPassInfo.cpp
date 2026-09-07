@@ -19,7 +19,7 @@ void RenderPassInfo::DeleteShader(PipeLineStage stage)
 	m_pipeLines[static_cast<int>(stage)].isValid = false;
 }
 
-bool RenderPassInfo::GetVertexShaderId(PipeLineStage stage, std::string& id) const
+bool RenderPassInfo::GetVertexShaderId(PipeLineStage stage, eastl::string& id) const
 {
 	if (m_pipeLines[static_cast<int>(stage)].isValid)
 	{
