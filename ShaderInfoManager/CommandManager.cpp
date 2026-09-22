@@ -1,4 +1,12 @@
 #include "CommandManager.h"
+#include "../GameEngine/Base.h"
+#include "../ShaderIO/RenderPassInfoIO.h"
+#include "../ShaderIO/ShaderInfoIO.h"
+
+
+#include <string>
+#include <codecvt>
+#include <locale>
 
 CommandManager::CommandManager()
 {
@@ -52,7 +60,7 @@ void CommandManager::DeleteShaderInTable(CommandShader& shader)
 
 }
 
-bool CommandManager::RegisterRenderPass( // invalid 쉐이더의 경우 nullptr 전달 사용자가 의식적으로 전달해야함
+bool CommandManager::RegisterRenderPass( // invalid 쉐이더의 경우 CommandShader::INVALID_SHADER 전달 사용자가 의식적으로 전달해야함
 	eastl::string passName,
 	CommandShader* vertShader,
 	CommandShader* hullShader,
@@ -61,18 +69,16 @@ bool CommandManager::RegisterRenderPass( // invalid 쉐이더의 경우 nullptr 
 	CommandShader* pixelShader
 )
 {
-	// nullptr 체크 + 패스 내 해당 쉐이더 valid 여부 체크
-	// 패스내 저장하려는 쉐이더가 valid 상태면 에러(중복 스테이지로 저장으로 매개변수 오입력)
-	// vertex , pixel 쉐이더는 필수로 nullptr 이면 즉시 에러
 
-	if (vertShader == nullptr || pixelShader == nullptr)
+	if (vertShader == CommandShader::INVALID_SHADER || pixelShader == CommandShader::INVALID_SHADER)
 	{
-		//assert! vertex , pixel 쉐이더는 필수로 nullptr일 수 없음
+		//assert! vertex , pixel 쉐이더는 필수로 CommandShader::INVALID_SHADER일 수 없음
+
 		return false;
 	}
 
 	CommandRenderPass renderPass(passName);
-	CommandShader* inputCommand = nullptr;
+	CommandShader* inputCommand = CommandShader::INVALID_SHADER;
 
 	RegisterShaderInTable(*vertShader , &inputCommand);
 	renderPass.SetRenderPassShader(*inputCommand);
@@ -87,13 +93,14 @@ bool CommandManager::RegisterRenderPass( // invalid 쉐이더의 경우 nullptr 
 	renderPass.SetRenderPassShader(*inputCommand);
 	if (!renderPass.IsValidStage(PipeLineStage::Pixel))
 	{
+
 		//assert pixel Shader 의 잘못 된 입력 다른 쉐이더 정보를 입력함
 		DeleteShaderInTable(*inputCommand);
 		return false;
 	}
 
 	
-	if (hullShader != nullptr)
+	if (hullShader != CommandShader::INVALID_SHADER)
 	{
 		RegisterShaderInTable(*hullShader, &inputCommand);
 		renderPass.SetRenderPassShader(*inputCommand);
@@ -107,7 +114,7 @@ bool CommandManager::RegisterRenderPass( // invalid 쉐이더의 경우 nullptr 
 	}
 
 
-	if (domainShader != nullptr && !renderPass.IsValidStage(PipeLineStage::Domain))
+	if (domainShader != CommandShader::INVALID_SHADER && !renderPass.IsValidStage(PipeLineStage::Domain))
 	{
 		RegisterShaderInTable(*domainShader, &inputCommand);
 		renderPass.SetRenderPassShader(*inputCommand);
@@ -119,7 +126,7 @@ bool CommandManager::RegisterRenderPass( // invalid 쉐이더의 경우 nullptr 
 		}
 	}
 
-	if (geoShader != nullptr && !renderPass.IsValidStage(PipeLineStage::Geometry))
+	if (geoShader != CommandShader::INVALID_SHADER && !renderPass.IsValidStage(PipeLineStage::Geometry))
 	{
 		RegisterShaderInTable(*geoShader, &inputCommand);
 		renderPass.SetRenderPassShader(*inputCommand);
@@ -180,4 +187,118 @@ eastl::vector<eastl::string> CommandManager::GetRenderPassNames()
 	}
 
 	return re;
+}
+
+bool CommandManager::RenderPassFileCompileAndSave(eastl::string filePath, eastl::string passFileName, eastl::string shaderFileName, ShaderCompiler::API useAPI)
+{
+	ShaderInfoIO shaderIO;
+	RenderPassInfoIO renderPassInfoIO;
+
+	MJEngine::ScopePtr<ShaderCompiler> shaderCompiler;
+	shaderCompiler->SetAPI(useAPI);
+
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> stdWStringConvert;
+	std::wstring argOrgFilePathWstrTemp = L"";
+	std::wstring argBinFilePathWstrTemp = L"";
+	eastl::string argEntryPointTemp = "";
+	eastl::string argTargetProfileTemp = "";
+	CommandRenderPass cmdRenderPass = {};
+
+
+	//compile & reflection 단계
+	for (const auto& cmdRenderPassElement : m_renderPassTable)
+	{
+		cmdRenderPass = cmdRenderPassElement.second;
+		RenderPassInfo renderPass;
+
+		//Input Layout 등록 위한 정점 쉐이더 정보 미리 빼둠
+		ShaderInfo vertexShaderInfo;
+		ShaderInfoDesc vertexShaderDesc;
+
+		for (uint8_t i = 0; i < PipeLineStageCnt(); i++)
+		{
+			PipeLineStage stage = static_cast<PipeLineStage>(i);
+			CommandShader* cmdShader = cmdRenderPass.GetRenderPassShader(stage);
+
+
+			if (cmdShader == CommandShader::INVALID_SHADER)
+				continue;
+
+			ShaderInfo shader;
+			ShaderInfoDesc shaderDesc;
+
+			argOrgFilePathWstrTemp = stdWStringConvert.from_bytes(cmdShader->GetFilePath().c_str());
+			argBinFilePathWstrTemp = stdWStringConvert.from_bytes(filePath.c_str());
+			argEntryPointTemp = cmdShader->GetEntryPoint();
+			argTargetProfileTemp = GetShaderProfileVersionString(cmdShader->GetProfileVersion());
+
+			shaderCompiler->ShaderCompile(
+				argOrgFilePathWstrTemp.c_str(),
+				argEntryPointTemp.c_str(),
+				argTargetProfileTemp.c_str(),
+				argBinFilePathWstrTemp.c_str(),
+				shader,
+				shaderDesc
+			);
+
+			if (stage == PipeLineStage::Vertex)
+			{
+				vertexShaderInfo = shader;
+				vertexShaderDesc = shaderDesc;
+			}
+
+			shaderIO.SetShader(
+				shader.m_id,
+				shader
+			);
+
+			// 쉐이더 IO 테이블에 등록되어 있는 ID 기준으로 가져옴
+			ShaderInfo* shaderInTable = nullptr;
+
+			shaderIO.FindShader(shader.m_id,&shaderInTable);
+			renderPass.SetShader(shader.m_stage ,*shaderInTable);
+		}
+
+	
+		//Input Layout 등록 단계
+		PassInputLayoutContext inputLayoutContext = {};
+		uint32_t inputSlot = 0;
+		for (ShaderIOLayoutElement vsElement : vertexShaderInfo.m_inputLayout)
+		{
+			InputLayoutElement passElement;
+
+			passElement.name = vsElement.semanticName;
+			passElement.format = vsElement.format;
+			passElement.inputSlot = inputSlot++;
+			passElement.alignedByteOffset = vsElement.alignedByteOffset;
+			passElement.semanticIndex = vsElement.semanticIndex;
+			passElement.location = vsElement.location;
+
+			inputLayoutContext.inputLayout.push_back(passElement);
+		}
+
+		if (cmdRenderPass.IsValidStage(PipeLineStage::Hull) && cmdRenderPass.IsValidStage(PipeLineStage::Domain))
+		{
+			//엔진 요구사항:
+			//hull -> domain 단계가 들어갈시 Topology 유형을 patch 로 해줘야함 
+			//이후 엔진에서 사용자 입력을 강제해야함
+			inputLayoutContext.primitiveTopology = PRIMITIVE_TOPOLOGY::UNDEFINED;
+		}
+		else
+		{
+			//엔진 요구사항:
+			// 기본 유형 -> 엔진에서 set으로 변경 가능하게 해줘야함
+			inputLayoutContext.primitiveTopology = PRIMITIVE_TOPOLOGY::TRIANGLE_LIST;
+		}
+		
+		renderPass.SetPassInputLayoutInfo(inputLayoutContext);
+
+		renderPassInfoIO.SetRenderPass(renderPass.renderPassId, renderPass);
+	}
+	
+
+	// file IO 단계 쉐이더 테이블 과 렌더 패스 테이블 파일 최종 저장
+	shaderIO.WriteShaderInfo(filePath.c_str(), passFileName.c_str());
+	renderPassInfoIO.WriteRenderPassInfo(filePath.c_str() , passFileName.c_str());
+	return true;
 }

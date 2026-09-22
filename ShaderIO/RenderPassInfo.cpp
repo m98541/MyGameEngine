@@ -19,7 +19,7 @@ void RenderPassInfo::DeleteShader(PipeLineStage stage)
 	m_pipeLines[static_cast<int>(stage)].isValid = false;
 }
 
-bool RenderPassInfo::GetVertexShaderId(PipeLineStage stage, eastl::string& id) const
+bool RenderPassInfo::GetShaderId(PipeLineStage stage, eastl::string& id) const
 {
 	if (m_pipeLines[static_cast<int>(stage)].isValid)
 	{
@@ -113,7 +113,7 @@ void InputLayoutElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 
 	if (jsonValue.HasMember(KEY_FORMAT))
 	{
-		format = static_cast<FORMAT>(jsonValue[KEY_FORMAT].GetUint());
+		format = static_cast<uint32_t>(jsonValue[KEY_FORMAT].GetUint());
 	}
 	else
 	{

@@ -1,6 +1,8 @@
 #ifndef COMMAND_MANGER_H
 #define COMMAND_MANGER_H
 #include "CommandRenderPass.h"
+#include "CommandShader.h"
+#include "ShaderCompiler.h"
 
 #include <EASTL/vector.h>
 #include <EASTL/unordered_map.h>
@@ -20,6 +22,7 @@ public:
 	~CommandManager();
 
 	bool RenderPassFileLoad(eastl::string filePath);
+	bool RenderPassFileCompileAndSave(eastl::string filePath, eastl::string passFileName, eastl::string shaderFileName,ShaderCompiler::API useAPI);
 
 	//bool registerShader(CommandShader& shader);
 	bool RegisterRenderPass( // invalid 쉐이더의 경우 nullptr 전달 사용자가 의식적으로 전달해야함
@@ -52,6 +55,7 @@ private:
 	// 해당 renderPassTable의 CommandRenderPass은 
 	// shaderTable에 존재하는 CommandShader로만 구현되어야함
 	eastl::unordered_map<eastl::string ,CommandRenderPass> m_renderPassTable;
+
 };
 
 #endif // !COMMAND_MANGER_H 

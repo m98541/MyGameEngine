@@ -12,13 +12,11 @@
 
 #include "CommandList.h"
 #include "CommandManager.h"
-#include "ShaderCompiler.h"
-#include "../ShaderIO/RenderPassInfoIO.h"
-#include "../ShaderIO/ShaderInfoIO.h"
 
 
 #include <iostream>
 #include <string>
+#include <limits>
 
 void* operator new[](size_t size, const char* pName, int flags, unsigned debugFlags, const char* file, int line)
 {
@@ -52,6 +50,7 @@ int main(void)
         이후 렌더 패스로만 등록 후 엔진에서 로드하여 
         바인딩 까지 성공하여 기능 점검이 된 후에 개별 쉐이더 핸들링 지원
     */
+
     CommandManager mainCmdManager;
 
     std::cout << "Shader Manager Program.\n";
@@ -96,8 +95,6 @@ int main(void)
         {
             ShaderProfileVersion renderPassProfile;
 
-            // 아래에서 만든 쉐이더들 포인터를 임시적으로 들고 있는 RenderPass 
-            CommandRenderPass tempRenderPass;
             bool successedPassProfileInput = false;
             do
             {
@@ -114,6 +111,7 @@ int main(void)
                 {
                     successedPassProfileInput = true;
                     renderPassProfile = static_cast<ShaderProfileVersion>(selectIndex);
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 }
                 else
                 {
@@ -124,8 +122,32 @@ int main(void)
 
             } while (!successedPassProfileInput); // 똑바로 입력 할때까지 시도하게 하기
             
+
+            //페스 이름 지정
+            bool inputSuccessed = true;
+            std::cin.clear();
+            eastl::string passName;
+            do
+            {
+                std::cout << "please input Render Pass Name\n";
+                std::cout << "pass name :";
+                if (!std::getline(std::cin, tempInput) || input.empty())
+                {
+                    inputSuccessed = false;
+                    std::cout << "fault input Please Retry.\n";
+                }
+                else
+                {
+                    passName = tempInput.c_str();
+                }
+
+            } while (!inputSuccessed);
+
+            // 아래에서 만든 쉐이더들 포인터를 임시적으로 들고 있는 RenderPass 
+            CommandRenderPass tempRenderPass(passName);
+
             //파이프의 스테이지 별 쉐이더 입력 필수 쉐이더는 무조건 입력 나머지는 선택 입력
-            for (size_t i = 0; i < PipeLineStageCnt(); i++)
+            for (size_t i = 1; i < PipeLineStageCnt(); i++)
             {
                 std::cout << "input " << GetPipeLineStageString(static_cast<PipeLineStage>(i)).c_str() << "? (y/n) :";
                
@@ -201,7 +223,7 @@ int main(void)
             
             //tempRenderPass 에 넣어둔 쉐이더 정보 mainCmdManager의 테이블 에 등록
 
-            mainCmdManager.RegisterRenderPass(
+            bool regPassSuccess =  mainCmdManager.RegisterRenderPass(
                 tempRenderPass.GetRenderPassName(),
                 tempRenderPass.GetRenderPassShader(PipeLineStage::Vertex),
                 tempRenderPass.GetRenderPassShader(PipeLineStage::Hull),
@@ -210,20 +232,58 @@ int main(void)
                 tempRenderPass.GetRenderPassShader(PipeLineStage::Pixel)
             );
 
+            if (!regPassSuccess)
+            {
+                std::cout << "RenderPassRegister Fail\n";
+            }
+
 
         }
         else if (input == CommandListStr[CommandEnum::VIEW_TABLE_RENDER_PASS])
         {
+            eastl::vector<eastl::string> passNames = mainCmdManager.GetRenderPassNames();
 
+            std::cout << "-RenderPass Table List- \n";
+            for (eastl::string name : passNames)
+            {
+                std::cout << name.c_str() << "\n";
+            }
         }
         else if (input == CommandListStr[CommandEnum::VIEW_TABLE_SHADER])
         {
 
+            std::cout << "-Shader Table List- \n";
+            size_t pipeCnt = PipeLineStageCnt();
+            for (size_t i = 0; i < pipeCnt; i++)
+            {
+                PipeLineStage stage = static_cast<PipeLineStage>(i);
+                eastl::string pipeLineStr = GetPipeLineStageString(stage);
+
+            }
+
         }
         else if (input == CommandListStr[CommandEnum::SAVE_FILE])
         {
+            eastl::string fileName;
+            std::cout << "-SAVE FILE- \n";
+            bool inputSuccessed = true;
+            do
+            {
+                std::cout << "file name :";
+                if (!std::getline(std::cin, tempInput) || input.empty())
+                {
+                    inputSuccessed = false;
+                    std::cout << "fault input Please Retry.\n";
+                }
+                else
+                {
+                    fileName = tempInput.c_str();
+                }
 
+            } while (!inputSuccessed);
 
+            mainCmdManager.RenderPassFileCompileAndSave("ShaderResource/",fileName + ".pass", fileName + ".st", ShaderCompiler::API::D3D11);
+            
         }
         else 
         {
@@ -236,3 +296,5 @@ int main(void)
 
 	return 0;
 }
+
+

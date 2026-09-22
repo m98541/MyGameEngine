@@ -1,3 +1,5 @@
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+
 #include "ShaderInfoIO.h"
 
 #include <iostream>
@@ -6,6 +8,8 @@
 
 
 #include <assert.h>
+
+
 
 
 void ShaderInfoIO::ReadShaderInfo(const char* jsonFilePath)
@@ -58,7 +62,7 @@ void ShaderInfoIO::ReadShaderInfo(const char* jsonFilePath)
 
 
 
-void ShaderInfoIO::WriteShaderInfo(const char* jsonFileName, const char* jsonFilePath)
+void ShaderInfoIO::WriteShaderInfo(const char* jsonFilePath, const char* jsonFileName)
 {
 	std::experimental::filesystem::path  dir = jsonFilePath;
 	std::experimental::filesystem::path  name = jsonFileName;
@@ -100,13 +104,13 @@ const eastl::vector<eastl::string> ShaderInfoIO::GetShaderIdList()const
 	return re;
 }
 
-bool ShaderInfoIO::FindShader(eastl::string id, ShaderInfo& outShader)const
+bool ShaderInfoIO::FindShader(eastl::string id, ShaderInfo** outShader)
 {
 	auto shader = m_shaderMap.find(id);
 
 	if (shader != m_shaderMap.end())
 	{
-		outShader = shader->second;
+		*outShader = &shader->second;
 		return true;
 	}
 	else

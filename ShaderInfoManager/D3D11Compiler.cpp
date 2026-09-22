@@ -11,6 +11,7 @@ FORMAT D3D11TypeToVariableFormat(const D3D11_SHADER_TYPE_DESC& shaderTypeDesc);
 VARIABLE_CLASS D3D11ClassTOVariableClass(const D3D_SHADER_VARIABLE_CLASS& typeClass);
 DXGI_FORMAT ExtractDxgiFormat(D3D_REGISTER_COMPONENT_TYPE componentType, BYTE mask);
 
+uint32_t GetByteSizeFromMask(BYTE mask);
 GlobalVariable ExtractVariableInfo(ID3D11ShaderReflectionVariable* d3dVariableReflection);
 GlobalVariable TraverseVariableMember(const char* memberName, ID3D11ShaderReflectionType* d3dVariableTypeReflection, const uint32_t baseOffset);
 
@@ -160,35 +161,42 @@ void D3D11Compiler::IoSignatureReflection(ShaderInfo& shaderInfo, ShaderInfoDesc
 	shaderInfo.m_outputLayout.reserve(shaderInfoDesc.outLayoutCnt);
 
 	ShaderIOLayoutElement ioLayoutElement = {};
-	for (uint32_t i = 0; i < shaderInfoDesc.inputLayoutCnt; i++)
+	for (uint32_t i = 0 ,curOffset = 0; i < shaderInfoDesc.inputLayoutCnt; i++)
 	{
+		m_reflectSource->GetInputParameterDesc(i, &parameterDesc);
+
 		//시스템 내부 변수 전달 값은 제외
 		if (parameterDesc.SystemValueType != D3D_NAME_UNDEFINED)
 			continue;
-
-		m_reflectSource->GetInputParameterDesc(i , &parameterDesc);
 
 		ioLayoutElement.semanticName = parameterDesc.SemanticName;
 		ioLayoutElement.semanticIndex = parameterDesc.SemanticIndex;
 		ioLayoutElement.format = static_cast<uint32_t>(ExtractDxgiFormat(parameterDesc.ComponentType , parameterDesc.Mask));
 
+		ioLayoutElement.alignedByteOffset = curOffset;
+		curOffset += GetByteSizeFromMask(parameterDesc.Mask);
+
 		shaderInfo.m_inputLayout.push_back(ioLayoutElement);
 	}
 
-	for (uint32_t i = 0; i < shaderInfoDesc.outLayoutCnt; i++)
+
+	for (uint32_t i = 0 ,curOffset = 0; i < shaderInfoDesc.outLayoutCnt; i++)
 	{
+		m_reflectSource->GetOutputParameterDesc(i, &parameterDesc);
+		
 		if (parameterDesc.SystemValueType != D3D_NAME_UNDEFINED)
 			continue;
 
-		m_reflectSource->GetOutputParameterDesc(i, &parameterDesc);
-		
 		ioLayoutElement.semanticName = parameterDesc.SemanticName;
 		ioLayoutElement.semanticIndex = parameterDesc.SemanticIndex;
 		ioLayoutElement.format = static_cast<uint32_t>(ExtractDxgiFormat(parameterDesc.ComponentType, parameterDesc.Mask));
 
+		ioLayoutElement.alignedByteOffset = curOffset;
+		curOffset += GetByteSizeFromMask(parameterDesc.Mask);
+
 		shaderInfo.m_outputLayout.push_back(ioLayoutElement);
 	}
-	
+	//3400000 293380
 
 }
 
@@ -521,6 +529,21 @@ GlobalVariable TraverseVariableMember(const char* memberName , ID3D11ShaderRefle
 	return reVariable;
 }
 
+uint32_t GetByteSizeFromMask(BYTE mask)
+{
+	BYTE componentMask = mask & 0x0F;
+
+	if (componentMask <= 0x01)     
+		return 4;
+	else if (componentMask <= 0x03)
+		return 8;
+	else if (componentMask <= 0x07)
+		return 12;
+	else if (componentMask <= 0x0F)
+		return 16;
+
+	return 0;
+}
 
 DXGI_FORMAT ExtractDxgiFormat(D3D_REGISTER_COMPONENT_TYPE componentType, BYTE mask)
 {

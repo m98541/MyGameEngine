@@ -6,14 +6,11 @@
 
 class ShaderCompiler
 {
+public:
 	enum class API : uint8_t
 	{
-		None , D3D11
+		None, D3D11
 	};
-private:
-	static API m_api;
-
-public:
 	~ShaderCompiler() = default;
 
 	virtual bool ShaderCompile(
@@ -29,5 +26,7 @@ public:
 	void SetAPI(API api) { m_api = api; }
 	API GetAPI() { return m_api; }
 
+private:
+	static API m_api;
 };
 #endif // !SHADER_COMPILER_H

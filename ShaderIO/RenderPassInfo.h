@@ -24,7 +24,7 @@ eastl::string targetProfileVersion; 는 여기서도 관리(사실상 디버깅 
 struct InputLayoutElement
 {
 	eastl::string name;
-	FORMAT format;
+	uint32_t format;
 	uint32_t inputSlot = 0;
 	uint32_t alignedByteOffset;
 
@@ -84,12 +84,12 @@ class RenderPassInfo
 public:
 	//set에서 IsVaild 상태 true로 설정 Set과정 ShaderInfo의 pipeline stage 정보 일치 확인 필요
 	void SetShader(PipeLineStage stage, const ShaderInfo& shader);
-
+	
 	//delete 과정에서는 IsVaild만 false 처리
 	void DeleteShader(PipeLineStage stage);
 
 	//get 통해서 id 정보 받아 조회 , IsVail 통과시 값 넣고 true 못하면 값 안넣어주고 false 반환
-	bool GetVertexShaderId(PipeLineStage stage, eastl::string& id)const;
+	bool GetShaderId(PipeLineStage stage, eastl::string& id)const;
 
 	//정말 간단한 패스 검증 기능(일단은 vertex pixel 이 존재 하는지 , Hull 과 Domain 이 함께 있는지 , Layout 규격정보 정도만 검사)
 	PassCheckResult RenderPassCheck() const;
@@ -113,7 +113,7 @@ public:
 private:
 
 	PassInputLayoutContext m_passInputContext;
-	eastl::array<PassElement, PipeLineStageCnt()> m_pipeLines;
+	eastl::array<PassElement, static_cast<size_t>(PipeLineStage::COUNT)> m_pipeLines;
 };
 
 #endif // !RENDERPASSINFO_H

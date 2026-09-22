@@ -34,6 +34,7 @@ struct ShaderIOLayoutElement
 	//FORMAT format; 일단 범용 포맷 사용 X 각 필드별 dxgi 포맷등을 드러내는 방식으로 그대로 사용
 	
 	bool systemValue = false; // SV_Position, gl_Position 같은 시스템 정의 값
+	uint32_t alignedByteOffset;
 
 	//HLSL 용 필드
 	eastl::string semanticName;

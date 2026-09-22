@@ -9,6 +9,7 @@
 // 4. HLSL 버전 정보 Major_Minor 결합 형태 <- 이건 사용자 임의 입력 X 선택하게 해야함 : enum 을 통해 표준 버전 중 택 필요  
 
 
+
 class CommandShader
 {
 
@@ -27,6 +28,7 @@ public:
 	PipeLineStage GetPipeLineStage();
 	ShaderProfileVersion GetProfileVersion();
 
+	static constexpr CommandShader* INVALID_SHADER = nullptr;
 private:
 	eastl::string m_orgFilePath;
 	eastl::string m_orgEntryPoint;

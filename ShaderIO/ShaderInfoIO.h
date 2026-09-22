@@ -10,11 +10,11 @@ class ShaderInfoIO
 
 public:
 	void ReadShaderInfo(const char* jsonFilePath);
-	void WriteShaderInfo(const char* jsonFileName ,const char* jsonFilePath);
+	void WriteShaderInfo(const char* jsonFilePath, const char* jsonFileName);
 
 
 	const eastl::vector<eastl::string> GetShaderIdList()const;
-	bool FindShader(eastl::string id, ShaderInfo& outShader)const;
+	bool FindShader(eastl::string id, ShaderInfo** outShader);
 	void SetShader(eastl::string id, ShaderInfo element);
 	void DeleteShader(eastl::string id);
 

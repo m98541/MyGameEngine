@@ -1,9 +1,12 @@
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+
 #include "RenderPassInfoIO.h"
 
 #include <iostream>
 #include <experimental/filesystem>
 #include <fstream>
 #include <string>
+
 void RenderPassInfoIO::ReadRenderPassInfo(const char* jsonFilePath)
 {
 	std::ifstream file(jsonFilePath);
