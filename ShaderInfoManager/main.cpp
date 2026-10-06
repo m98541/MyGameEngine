@@ -28,7 +28,7 @@ void* operator new[](size_t size, size_t alignment, size_t alignmentOffset, cons
 {
     // 정렬(alignment)이 필요한 할당의 경우 (예: _aligned_malloc 등 사용)
 #ifdef _MSC_VER
-    return _aligned_malloc(size, alignment);
+    return malloc(size);
 #else
     // POSIX 등 타 플랫폼에 맞는 aligned 할당
     void* ptr = nullptr;
@@ -89,7 +89,25 @@ int main(void)
         } 
         else if (input == CommandListStr[CommandEnum::RENDER_PASS_LOAD])
         {
-            
+            bool inputSuccessed = true;
+            std::cin.clear();
+            eastl::string passPath;
+            do
+            {
+                std::cout << "please input Render Pass Path\n";
+                std::cout << "RenderPass Path :";
+                if (!std::getline(std::cin, tempInput) || input.empty())
+                {
+                    inputSuccessed = false;
+                    std::cout << "fault input Please Retry.\n";
+                }
+                else
+                {
+                    passPath = tempInput.c_str();
+                }
+
+            } while (!inputSuccessed);
+
         }
         else if (input == CommandListStr[CommandEnum::REGISTER_RENDER_PASS])
         {
@@ -224,12 +242,7 @@ int main(void)
             //tempRenderPass 에 넣어둔 쉐이더 정보 mainCmdManager의 테이블 에 등록
 
             bool regPassSuccess =  mainCmdManager.RegisterRenderPass(
-                tempRenderPass.GetRenderPassName(),
-                tempRenderPass.GetRenderPassShader(PipeLineStage::Vertex),
-                tempRenderPass.GetRenderPassShader(PipeLineStage::Hull),
-                tempRenderPass.GetRenderPassShader(PipeLineStage::Domain),
-                tempRenderPass.GetRenderPassShader(PipeLineStage::Geometry),
-                tempRenderPass.GetRenderPassShader(PipeLineStage::Pixel)
+              tempRenderPass
             );
 
             if (!regPassSuccess)
@@ -258,9 +271,17 @@ int main(void)
             {
                 PipeLineStage stage = static_cast<PipeLineStage>(i);
                 eastl::string pipeLineStr = GetPipeLineStageString(stage);
+                eastl::vector<eastl::string> nameTable = mainCmdManager.GetStageShaderNamesTable(stage);
+
+                std::cout << pipeLineStr.c_str() << ":";
+
+                for (eastl::string name : nameTable)
+                {
+                    std::cout << name.c_str() << " ,";
+                }
+                std::cout << "\n";
 
             }
-
         }
         else if (input == CommandListStr[CommandEnum::SAVE_FILE])
         {
@@ -282,7 +303,7 @@ int main(void)
 
             } while (!inputSuccessed);
 
-            mainCmdManager.RenderPassFileCompileAndSave("ShaderResource/",fileName + ".pass", fileName + ".st", ShaderCompiler::API::D3D11);
+            mainCmdManager.RenderPassFileCompileAndSave("ShaderResource/",fileName + ".pass", fileName + ".ShaderTable", ShaderCompiler::API::D3D11);
             
         }
         else 

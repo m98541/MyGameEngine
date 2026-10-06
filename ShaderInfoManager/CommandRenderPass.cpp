@@ -13,9 +13,9 @@ eastl::string CommandRenderPass::GetRenderPassName()
 	return m_passName;
 }
 
-CommandShader* CommandRenderPass::SetRenderPassShader(CommandShader& shader)
+CommandShader* CommandRenderPass::SetRenderPassShader(CommandShader shader)
 {
-	CommandShader* re = nullptr;
+	CommandShader re = {};
 
 	uint8_t stage = static_cast<uint8_t>( shader.GetPipeLineStage() );
 
@@ -28,9 +28,9 @@ CommandShader* CommandRenderPass::SetRenderPassShader(CommandShader& shader)
 		m_validList[stage] = true;
 	}
 
-	m_renderPass[stage] = &shader;
+	m_renderPass[stage] = shader;
 	
-	return re;
+	return &re;
 }
 
 bool CommandRenderPass::IsValidStage(PipeLineStage stage)
@@ -40,5 +40,5 @@ bool CommandRenderPass::IsValidStage(PipeLineStage stage)
 
 CommandShader* CommandRenderPass::GetRenderPassShader(PipeLineStage stage)
 {
-	return m_renderPass[static_cast<uint8_t>(stage)];
+	return &m_renderPass[static_cast<uint8_t>(stage)];
 }

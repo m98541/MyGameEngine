@@ -115,7 +115,7 @@ void RenderPassInfoIO::SetRenderPassMaterialTag(eastl::string id, eastl::string 
 
 void RenderPassInfoIO::SetRenderPass(eastl::string id, RenderPassInfo element)
 {
-	m_renderPassList[id] = element;
+	m_renderPassList[id] = eastl::move(element);
 }
 void RenderPassInfoIO::ClearRenderPassList()
 {

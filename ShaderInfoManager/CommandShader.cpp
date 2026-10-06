@@ -32,4 +32,4 @@ PipeLineStage CommandShader::GetPipeLineStage()
 ShaderProfileVersion CommandShader::GetProfileVersion()
 {
 	return m_profileVersion;
-}
+}	

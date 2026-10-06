@@ -122,7 +122,7 @@ bool ShaderInfoIO::FindShader(eastl::string id, ShaderInfo** outShader)
 
 void ShaderInfoIO::SetShader(eastl::string id, ShaderInfo element)
 {
-	m_shaderMap[id] = element;
+	m_shaderMap[id] = eastl::move(element);
 }
 
 void ShaderInfoIO::DeleteShader(eastl::string id)

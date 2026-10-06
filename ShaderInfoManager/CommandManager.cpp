@@ -2,6 +2,7 @@
 #include "../GameEngine/Base.h"
 #include "../ShaderIO/RenderPassInfoIO.h"
 #include "../ShaderIO/ShaderInfoIO.h"
+#include "../StringFormatAssert/StringFormatAssert.h"
 
 
 #include <string>
@@ -61,30 +62,30 @@ void CommandManager::DeleteShaderInTable(CommandShader& shader)
 }
 
 bool CommandManager::RegisterRenderPass( // invalid 쉐이더의 경우 CommandShader::INVALID_SHADER 전달 사용자가 의식적으로 전달해야함
-	eastl::string passName,
-	CommandShader* vertShader,
-	CommandShader* hullShader,
-	CommandShader* domainShader,
-	CommandShader* geoShader,
-	CommandShader* pixelShader
+	CommandRenderPass renderPass
 )
 {
+	
 
-	if (vertShader == CommandShader::INVALID_SHADER || pixelShader == CommandShader::INVALID_SHADER)
+	if (!renderPass.IsValidStage(PipeLineStage::Vertex) || !renderPass.IsValidStage(PipeLineStage::Pixel))
 	{
-		//assert! vertex , pixel 쉐이더는 필수로 CommandShader::INVALID_SHADER일 수 없음
-
+		SF_ASSERTE(renderPass.IsValidStage(PipeLineStage::Vertex) || renderPass.IsValidStage(PipeLineStage::Pixel),"assert! vertex , pixel 쉐이더는 필수로 CommandShader::INVALID_SHADER일 수 없음 ");
 		return false;
 	}
 
-	CommandRenderPass renderPass(passName);
+	CommandShader* vertShader = renderPass.GetRenderPassShader(PipeLineStage::Vertex);
+	CommandShader* pixelShader = renderPass.GetRenderPassShader(PipeLineStage::Pixel);
+	CommandShader* hullShader = renderPass.GetRenderPassShader(PipeLineStage::Hull);
+	CommandShader* domainShader = renderPass.GetRenderPassShader(PipeLineStage::Domain);
+	CommandShader* geoShader = renderPass.GetRenderPassShader(PipeLineStage::Geometry);
+
 	CommandShader* inputCommand = CommandShader::INVALID_SHADER;
 
 	RegisterShaderInTable(*vertShader , &inputCommand);
 	renderPass.SetRenderPassShader(*inputCommand);
 	if (!renderPass.IsValidStage(PipeLineStage::Vertex))
 	{
-		//assert Vertex Shader 의 잘못 된 입력 다른 쉐이더 정보를 입력함
+		SF_ASSERTE(renderPass.IsValidStage(PipeLineStage::Vertex),"assert Vertex Shader fault!");
 		DeleteShaderInTable(*inputCommand);
 		return false;
 	}
@@ -93,52 +94,51 @@ bool CommandManager::RegisterRenderPass( // invalid 쉐이더의 경우 CommandS
 	renderPass.SetRenderPassShader(*inputCommand);
 	if (!renderPass.IsValidStage(PipeLineStage::Pixel))
 	{
-
-		//assert pixel Shader 의 잘못 된 입력 다른 쉐이더 정보를 입력함
+		SF_ASSERTE(renderPass.IsValidStage(PipeLineStage::Pixel),"assert pixel Shader 의 잘못 된 입력 다른 쉐이더 정보를 입력함 ");
 		DeleteShaderInTable(*inputCommand);
 		return false;
 	}
 
 	
-	if (hullShader != CommandShader::INVALID_SHADER)
+	if (hullShader->GetPipeLineStage() != PipeLineStage::Unknown)
 	{
 		RegisterShaderInTable(*hullShader, &inputCommand);
 		renderPass.SetRenderPassShader(*inputCommand);
 		// 다음처럼 에러처리를 해야 어떤 쉐이더를 잘못입력하였는지 알려줄 수 있음
 		if (!renderPass.IsValidStage(PipeLineStage::Hull))
 		{
-			//assert hull Shader 의 잘못 된 입력 다른 쉐이더 정보를 입력함
+			SF_ASSERTE(renderPass.IsValidStage(PipeLineStage::Hull),"assert hull Shader 의 잘못 된 입력 다른 쉐이더 정보를 입력함 ");
 			DeleteShaderInTable(*inputCommand);
 			return false;
 		}
 	}
 
 
-	if (domainShader != CommandShader::INVALID_SHADER && !renderPass.IsValidStage(PipeLineStage::Domain))
+	if (domainShader->GetPipeLineStage() != PipeLineStage::Unknown && !renderPass.IsValidStage(PipeLineStage::Domain))
 	{
 		RegisterShaderInTable(*domainShader, &inputCommand);
 		renderPass.SetRenderPassShader(*inputCommand);
 		if (!renderPass.IsValidStage(PipeLineStage::Domain))
 		{
-			//assert Domain Shader 의 잘못 된 입력 다른 쉐이더 정보를 입력함
+			SF_ASSERTE(renderPass.IsValidStage(PipeLineStage::Domain),"assert Domain Shader 의 잘못 된 입력 다른 쉐이더 정보를 입력함 ");
 			DeleteShaderInTable(*inputCommand);
 			return false;
 		}
 	}
 
-	if (geoShader != CommandShader::INVALID_SHADER && !renderPass.IsValidStage(PipeLineStage::Geometry))
+	if (geoShader->GetPipeLineStage() != PipeLineStage::Unknown && !renderPass.IsValidStage(PipeLineStage::Geometry))
 	{
 		RegisterShaderInTable(*geoShader, &inputCommand);
 		renderPass.SetRenderPassShader(*inputCommand);
 		if (!renderPass.IsValidStage(PipeLineStage::Geometry))
 		{
-			//assert Geometry Shader 의 잘못 된 입력 다른 쉐이더 정보를 입력함
+			SF_ASSERTE(renderPass.IsValidStage(PipeLineStage::Geometry),"assert Geometry Shader 의 잘못 된 입력 다른 쉐이더 정보를 입력함 ");
 			DeleteShaderInTable(*inputCommand);
 			return false;
 		}
 	}
 
-	m_renderPassTable[passName] = renderPass;
+	m_renderPassTable[renderPass.GetRenderPassName()] = renderPass;
 	
 	return true;
 }
@@ -191,48 +191,56 @@ eastl::vector<eastl::string> CommandManager::GetRenderPassNames()
 
 bool CommandManager::RenderPassFileCompileAndSave(eastl::string filePath, eastl::string passFileName, eastl::string shaderFileName, ShaderCompiler::API useAPI)
 {
+	
 	ShaderInfoIO shaderIO;
 	RenderPassInfoIO renderPassInfoIO;
 
-	MJEngine::ScopePtr<ShaderCompiler> shaderCompiler;
-	shaderCompiler->SetAPI(useAPI);
+	MJEngine::RefPtr<ShaderCompiler> shaderCompiler ;
+	shaderCompiler = shaderCompiler->Create(useAPI);
+
 
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> stdWStringConvert;
 	std::wstring argOrgFilePathWstrTemp = L"";
 	std::wstring argBinFilePathWstrTemp = L"";
 	eastl::string argEntryPointTemp = "";
 	eastl::string argTargetProfileTemp = "";
-	CommandRenderPass cmdRenderPass = {};
 
 
 	//compile & reflection 단계
-	for (const auto& cmdRenderPassElement : m_renderPassTable)
+	for (auto& cmdRenderPassElement : m_renderPassTable)
 	{
-		cmdRenderPass = cmdRenderPassElement.second;
+		CommandRenderPass& cmdRenderPass = cmdRenderPassElement.second;
 		RenderPassInfo renderPass;
 
 		//Input Layout 등록 위한 정점 쉐이더 정보 미리 빼둠
 		ShaderInfo vertexShaderInfo;
 		ShaderInfoDesc vertexShaderDesc;
 
-		for (uint8_t i = 0; i < PipeLineStageCnt(); i++)
+		for (uint8_t i = 1; i < PipeLineStageCnt(); i++)
 		{
 			PipeLineStage stage = static_cast<PipeLineStage>(i);
 			CommandShader* cmdShader = cmdRenderPass.GetRenderPassShader(stage);
 
 
-			if (cmdShader == CommandShader::INVALID_SHADER)
+			if (!cmdRenderPass.IsValidStage(stage))
 				continue;
 
 			ShaderInfo shader;
 			ShaderInfoDesc shaderDesc;
 
+			
+
 			argOrgFilePathWstrTemp = stdWStringConvert.from_bytes(cmdShader->GetFilePath().c_str());
 			argBinFilePathWstrTemp = stdWStringConvert.from_bytes(filePath.c_str());
 			argEntryPointTemp = cmdShader->GetEntryPoint();
-			argTargetProfileTemp = GetShaderProfileVersionString(cmdShader->GetProfileVersion());
+			argTargetProfileTemp = GetHLSLTargetString(stage , cmdShader->GetProfileVersion());
 
-			shaderCompiler->ShaderCompile(
+			argBinFilePathWstrTemp += L"\\"
+				+ stdWStringConvert.from_bytes(cmdRenderPass.GetRenderPassName().c_str()) 
+				+ stdWStringConvert.from_bytes(GetPipeLineStageString(stage).c_str())
+				+ L".ShaderBin";
+
+			bool resultShdaerCompile = shaderCompiler->ShaderCompile(
 				argOrgFilePathWstrTemp.c_str(),
 				argEntryPointTemp.c_str(),
 				argTargetProfileTemp.c_str(),
@@ -241,6 +249,9 @@ bool CommandManager::RenderPassFileCompileAndSave(eastl::string filePath, eastl:
 				shaderDesc
 			);
 
+			SF_ASSERTE(resultShdaerCompile , "Assert Shader Compile Fail /pass %s /stage %s ", cmdRenderPass.GetRenderPassName().c_str(), GetPipeLineStageString(stage).c_str());
+			shader.m_id = cmdShader->GetFilePath();
+			shader.m_stage = stage;
 			if (stage == PipeLineStage::Vertex)
 			{
 				vertexShaderInfo = shader;
@@ -259,7 +270,7 @@ bool CommandManager::RenderPassFileCompileAndSave(eastl::string filePath, eastl:
 			renderPass.SetShader(shader.m_stage ,*shaderInTable);
 		}
 
-	
+		
 		//Input Layout 등록 단계
 		PassInputLayoutContext inputLayoutContext = {};
 		uint32_t inputSlot = 0;
@@ -290,15 +301,17 @@ bool CommandManager::RenderPassFileCompileAndSave(eastl::string filePath, eastl:
 			// 기본 유형 -> 엔진에서 set으로 변경 가능하게 해줘야함
 			inputLayoutContext.primitiveTopology = PRIMITIVE_TOPOLOGY::TRIANGLE_LIST;
 		}
-		
+		renderPass.renderPassId = cmdRenderPass.GetRenderPassName();
 		renderPass.SetPassInputLayoutInfo(inputLayoutContext);
 
 		renderPassInfoIO.SetRenderPass(renderPass.renderPassId, renderPass);
 	}
 	
-
+	
 	// file IO 단계 쉐이더 테이블 과 렌더 패스 테이블 파일 최종 저장
-	shaderIO.WriteShaderInfo(filePath.c_str(), passFileName.c_str());
-	renderPassInfoIO.WriteRenderPassInfo(filePath.c_str() , passFileName.c_str());
+	shaderIO.WriteShaderInfo(filePath.c_str(), shaderFileName.c_str());
+	renderPassInfoIO.WriteRenderPassInfo(passFileName.c_str(), filePath.c_str());
+
+
 	return true;
 }

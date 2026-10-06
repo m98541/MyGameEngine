@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <EASTL/vector.h>
 #include <EASTL/map.h>
+#include "../StringFormatAssert/StringFormatAssert.h"
 
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "dxguid.lib")
@@ -51,6 +52,7 @@ bool D3D11Compiler::ShaderCompile(
 	if (!SUCCEEDED(hr))
 	{
 		//assert! D3DCompileFromFile의 성공 여부
+		SF_ASSERTE(SUCCEEDED(hr) , "D3DCompileFromFile Fail\ninput info\nhlslFilePath:%ls\nentryPoint:%s\ntargetProfile:%s ", hlslFilePath , entryPoint , targetProfile);
 		return false;
 	}
 
@@ -74,7 +76,9 @@ bool D3D11Compiler::ShaderCompile(
 	}
 	else
 	{
+		const char* errorMsg = (const char*)errorBlob->GetBufferPointer();
 		//assert! D3DWriteBlobToFile 실패
+		SF_ASSERTE(SUCCEEDED(hr) , "D3DWriteBlobToFile fail outputBinPath : %ls error : %s", outputBinPath, errorMsg);
 		return false;
 	}
 

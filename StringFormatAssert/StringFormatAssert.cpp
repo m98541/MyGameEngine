@@ -1,7 +1,9 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "StringFormatAssert.h"
+
 void HandleAssertFailure(const char* file, const char* func, int line, const char* expression, const char* msg, ...)
 {
 	char msgBuffer[MAX_MSG_SIZE]; 

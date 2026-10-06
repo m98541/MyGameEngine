@@ -1,10 +1,9 @@
 #ifndef STRING_FORMAT_ASSERT
 #define STRING_FORMAT_ASSERT
 
-
 #define MAX_MSG_SIZE 512
 
-void HandleAssertFailure(const char* file, const char* func, int line, const char* expression, const char* msg, ...);
+void HandleAssertFailure (const char* file, const char* func, int line, const char* expression, const char* msg, ...);
 
 #if __cplusplus >= 202002L || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)
 #define SF_ASSERTE(expression,msg,...) \
@@ -23,7 +22,7 @@ void HandleAssertFailure(const char* file, const char* func, int line, const cha
 		}\
 	} while (0)
 #else 
-#define SF_ASSERTE(expression,msg,...) \
+#define SF_ASSERTE(expression,msg,...)\
 	do { \
 		if(!(expression))\
 		{\

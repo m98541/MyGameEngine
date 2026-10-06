@@ -26,12 +26,7 @@ public:
 
 	//bool registerShader(CommandShader& shader);
 	bool RegisterRenderPass( // invalid 쉐이더의 경우 nullptr 전달 사용자가 의식적으로 전달해야함
-		eastl::string passName,
-		CommandShader* vertShader, 
-		CommandShader* hullShader, 
-		CommandShader* domainShader,
-		CommandShader* geoShader,
-		CommandShader* pixelShader
+		CommandRenderPass renderPass
 	);
 
 	void DeleteRenderPass(eastl::string passName);

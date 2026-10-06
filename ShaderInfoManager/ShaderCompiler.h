@@ -22,7 +22,7 @@ public:
 		ShaderInfoDesc& shaderInfoDesc
 	) = 0;
 	
-	static MJEngine::ScopePtr<ShaderCompiler> Create();
+	static MJEngine::ScopePtr<ShaderCompiler> Create(API api);
 	void SetAPI(API api) { m_api = api; }
 	API GetAPI() { return m_api; }
 

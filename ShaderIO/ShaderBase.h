@@ -185,13 +185,9 @@ inline eastl::string GetShaderProfileVersionString(ShaderProfileVersion version)
 }
 
 
-
-
-/* 해당 함수는 이후 엔진 내부 쉐이더 Dx 종속 영역 Shader 적옹 부분에서 동작 시킴
-// HLSL 타깃 프로필 문자열 생성 (e.g. vs_5_0, ps_6_0)
-inline std::string GetHLSLTargetString(PipeLineStage stage, ShaderProfileVersion version)
+inline eastl::string GetHLSLTargetString(PipeLineStage stage, ShaderProfileVersion version)
 {
-	std::string stagePrefix;
+	eastl::string stagePrefix;
 	switch (stage)
 	{
 	case PipeLineStage::Vertex:   stagePrefix = "vs_"; break;
@@ -199,27 +195,27 @@ inline std::string GetHLSLTargetString(PipeLineStage stage, ShaderProfileVersion
 	case PipeLineStage::Domain:   stagePrefix = "ds_"; break;
 	case PipeLineStage::Geometry: stagePrefix = "gs_"; break;
 	case PipeLineStage::Pixel:    stagePrefix = "ps_"; break;
-	case PipeLineStage::Compute:  stagePrefix = "cs_"; break;
 	default: return "";
 	}
 
-	std::string versionStr;
+	eastl::string versionStr;
 	switch (version)
 	{
-	case ShaderProfileVersion::HLSL_5_0: version = "5_0"; break;
-	case ShaderProfileVersion::HLSL_5_1: version = "5_1"; break;
-	case ShaderProfileVersion::HLSL_6_0: version = "6_0"; break;
-	case ShaderProfileVersion::HLSL_6_5: version = "6_5"; break;
-	case ShaderProfileVersion::HLSL_6_6: version = "6_6"; break;
+	case ShaderProfileVersion::HLSL_5_0: versionStr = "5_0"; break;
+	case ShaderProfileVersion::HLSL_5_1: versionStr = "5_1"; break;
+	case ShaderProfileVersion::HLSL_6_0: versionStr = "6_0"; break;
+	case ShaderProfileVersion::HLSL_6_5: versionStr = "6_5"; break;
+	case ShaderProfileVersion::HLSL_6_6: versionStr = "6_6"; break;
 	default: return "";
 	}
 
-	return stagePrefix + versionStr; // e.g. "ps_5_0"
+	return (stagePrefix + versionStr).c_str(); 
 };
 
 
 
-*/
+
+
 
 
 

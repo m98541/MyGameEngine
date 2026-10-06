@@ -4,8 +4,10 @@
 // m_api의 실제 메모리 할당 및 초기화
 ShaderCompiler::API ShaderCompiler::m_api = ShaderCompiler::API::D3D11;
 
-MJEngine::ScopePtr<ShaderCompiler> ShaderCompiler::Create()
+MJEngine::ScopePtr<ShaderCompiler> ShaderCompiler::Create(ShaderCompiler::API useApi)
 {
+	m_api = useApi;
+
 	switch (m_api)
 	{
 	case ShaderCompiler::API::None:
