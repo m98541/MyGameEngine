@@ -2,6 +2,8 @@
 #define COMMAND_SHADER_H
 #include <eastl/string.h>
 #include "../ShaderIO/ShaderBase.h"
+#include "../ShaderIO/ShaderInfo.h"
+#include "../ShaderIO/RenderPassInfoIO.h"
 // 쉐이더 컴파일을 위해서 사용자에게 받아야 하는 정보체
 // 1. 원본 파일 이름 (경로명)
 // 2. entryPoint 이름
@@ -23,6 +25,8 @@ public:
 		ShaderProfileVersion profileVersion
 	);
 	
+	CommandShader(ShaderInfo shader);
+
 	eastl::string GetFilePath();
 	eastl::string GetEntryPoint();
 	PipeLineStage GetPipeLineStage();

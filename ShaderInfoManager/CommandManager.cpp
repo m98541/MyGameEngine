@@ -19,6 +19,64 @@ CommandManager::~CommandManager()
 
 }
 
+bool CommandManager::RenderPassFileLoad(eastl::string renderPassFilePath)
+{
+
+	/*
+		commandShader&pass <=> Shader & RenderPass 
+		상호 로드 가능하게 만들어야 함
+		
+		IO 로 부터 각각에 대한 테이블 부터 만들어 줘야함 
+		즉 등록과정에서의 사용자 입력이 RenderPassIo 의 정보가 되어지고 
+		해당 정보에 해당하는 쉐이더 정보를 테이블 에서 참조해야함
+
+		1. 테이블 먼저 완성한뒤 이후 2. 구조 잡기 해야함
+
+	*/
+	RenderPassInfoIO renderPassInfoIO;
+	ShaderInfoIO shaderInfoIO;
+
+	renderPassInfoIO.ReadRenderPassInfo(renderPassFilePath.c_str());
+	eastl::string shaderTableFilePath = renderPassInfoIO.GetShaderTableFilePath();
+	shaderInfoIO.ReadShaderInfo(shaderTableFilePath.c_str());
+
+	//패스 테이블 형태 구성 과정에서 개별 구성 시키기	
+	const eastl::vector<eastl::string> renderPassIdList = renderPassInfoIO.GetRenderPassIdList();
+	
+	RenderPassInfo tempRenderPass = {};
+	ShaderInfo* tempShaderInfo;
+
+	for (const auto& renderPassId : renderPassIdList)
+	{
+		renderPassInfoIO.FindRenderPass(renderPassId , tempRenderPass);
+		CommandRenderPass inputCmdRenderPass(renderPassId);
+
+		for (PipeLineStage stage = PipeLineStage::Vertex;
+			stage < PipeLineStage::COUNT; 
+			++stage)
+		{
+			uint8_t stageIdx = static_cast<uint8_t>(stage);
+			
+			if (!tempRenderPass.IsValidStage(stage))
+				continue;
+			
+			eastl::string shaderId;
+			tempRenderPass.GetShaderId(stage , shaderId);
+			shaderInfoIO.FindShader(shaderId, &tempShaderInfo);
+			
+			CommandShader inputCmdShader(*tempShaderInfo); 
+			CommandShader* cmdShaderTableAddr;
+			RegisterShaderInTable(inputCmdShader , &cmdShaderTableAddr);
+
+			inputCmdRenderPass.SetRenderPassShader(cmdShaderTableAddr);
+		}
+
+		RegisterRenderPass(inputCmdRenderPass);
+	}
+
+	return true;
+}
+
 void CommandManager::RegisterShaderInTable(CommandShader& shader, CommandShader** outTableShaderAddr)
 {
 	uint8_t stage = static_cast<uint8_t>(shader.GetPipeLineStage());
@@ -82,7 +140,7 @@ bool CommandManager::RegisterRenderPass( // invalid 쉐이더의 경우 CommandS
 	CommandShader* inputCommand = CommandShader::INVALID_SHADER;
 
 	RegisterShaderInTable(*vertShader , &inputCommand);
-	renderPass.SetRenderPassShader(*inputCommand);
+	renderPass.SetRenderPassShader(inputCommand);
 	if (!renderPass.IsValidStage(PipeLineStage::Vertex))
 	{
 		SF_ASSERTE(renderPass.IsValidStage(PipeLineStage::Vertex),"assert Vertex Shader fault!");
@@ -91,7 +149,7 @@ bool CommandManager::RegisterRenderPass( // invalid 쉐이더의 경우 CommandS
 	}
 
 	RegisterShaderInTable(*pixelShader, &inputCommand);
-	renderPass.SetRenderPassShader(*inputCommand);
+	renderPass.SetRenderPassShader(inputCommand);
 	if (!renderPass.IsValidStage(PipeLineStage::Pixel))
 	{
 		SF_ASSERTE(renderPass.IsValidStage(PipeLineStage::Pixel),"assert pixel Shader 의 잘못 된 입력 다른 쉐이더 정보를 입력함 ");
@@ -100,10 +158,10 @@ bool CommandManager::RegisterRenderPass( // invalid 쉐이더의 경우 CommandS
 	}
 
 	
-	if (hullShader->GetPipeLineStage() != PipeLineStage::Unknown)
+	if (renderPass.IsValidStage(PipeLineStage::Hull))
 	{
 		RegisterShaderInTable(*hullShader, &inputCommand);
-		renderPass.SetRenderPassShader(*inputCommand);
+		renderPass.SetRenderPassShader(inputCommand);
 		// 다음처럼 에러처리를 해야 어떤 쉐이더를 잘못입력하였는지 알려줄 수 있음
 		if (!renderPass.IsValidStage(PipeLineStage::Hull))
 		{
@@ -114,10 +172,10 @@ bool CommandManager::RegisterRenderPass( // invalid 쉐이더의 경우 CommandS
 	}
 
 
-	if (domainShader->GetPipeLineStage() != PipeLineStage::Unknown && !renderPass.IsValidStage(PipeLineStage::Domain))
+	if (renderPass.IsValidStage(PipeLineStage::Domain))
 	{
 		RegisterShaderInTable(*domainShader, &inputCommand);
-		renderPass.SetRenderPassShader(*inputCommand);
+		renderPass.SetRenderPassShader(inputCommand);
 		if (!renderPass.IsValidStage(PipeLineStage::Domain))
 		{
 			SF_ASSERTE(renderPass.IsValidStage(PipeLineStage::Domain),"assert Domain Shader 의 잘못 된 입력 다른 쉐이더 정보를 입력함 ");
@@ -126,10 +184,10 @@ bool CommandManager::RegisterRenderPass( // invalid 쉐이더의 경우 CommandS
 		}
 	}
 
-	if (geoShader->GetPipeLineStage() != PipeLineStage::Unknown && !renderPass.IsValidStage(PipeLineStage::Geometry))
+	if (renderPass.IsValidStage(PipeLineStage::Geometry))
 	{
 		RegisterShaderInTable(*geoShader, &inputCommand);
-		renderPass.SetRenderPassShader(*inputCommand);
+		renderPass.SetRenderPassShader(inputCommand);
 		if (!renderPass.IsValidStage(PipeLineStage::Geometry))
 		{
 			SF_ASSERTE(renderPass.IsValidStage(PipeLineStage::Geometry),"assert Geometry Shader 의 잘못 된 입력 다른 쉐이더 정보를 입력함 ");
@@ -301,15 +359,16 @@ bool CommandManager::RenderPassFileCompileAndSave(eastl::string filePath, eastl:
 			// 기본 유형 -> 엔진에서 set으로 변경 가능하게 해줘야함
 			inputLayoutContext.primitiveTopology = PRIMITIVE_TOPOLOGY::TRIANGLE_LIST;
 		}
-		renderPass.renderPassId = cmdRenderPass.GetRenderPassName();
+		renderPass.m_renderPassId = cmdRenderPass.GetRenderPassName();
 		renderPass.SetPassInputLayoutInfo(inputLayoutContext);
 
-		renderPassInfoIO.SetRenderPass(renderPass.renderPassId, renderPass);
+		renderPassInfoIO.SetRenderPass(renderPass.m_renderPassId, renderPass);
 	}
 	
 	
 	// file IO 단계 쉐이더 테이블 과 렌더 패스 테이블 파일 최종 저장
 	shaderIO.WriteShaderInfo(filePath.c_str(), shaderFileName.c_str());
+	renderPassInfoIO.SetShaderTableFilePath((filePath + "/" + shaderFileName).c_str());
 	renderPassInfoIO.WriteRenderPassInfo(passFileName.c_str(), filePath.c_str());
 
 

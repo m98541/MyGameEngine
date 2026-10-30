@@ -1,5 +1,5 @@
 #include "CommandRenderPass.h"
-
+#include "../ShaderIO/ShaderInfo.h"
 CommandRenderPass::CommandRenderPass()
 {
 }
@@ -8,16 +8,18 @@ CommandRenderPass::CommandRenderPass(eastl::string passName)
 	m_passName = passName;
 }
 
+
+
 eastl::string CommandRenderPass::GetRenderPassName()
 {
 	return m_passName;
 }
 
-CommandShader* CommandRenderPass::SetRenderPassShader(CommandShader shader)
+CommandShader* CommandRenderPass::SetRenderPassShader(CommandShader* shader)
 {
-	CommandShader re = {};
+	CommandShader* re = nullptr;
 
-	uint8_t stage = static_cast<uint8_t>( shader.GetPipeLineStage() );
+	uint8_t stage = static_cast<uint8_t>( shader->GetPipeLineStage() );
 
 	if (m_validList[stage])
 	{// 이미 활성 되있던 쉐이더 기존 쉐이더 주소는 반환
@@ -30,7 +32,7 @@ CommandShader* CommandRenderPass::SetRenderPassShader(CommandShader shader)
 
 	m_renderPass[stage] = shader;
 	
-	return &re;
+	return re;
 }
 
 bool CommandRenderPass::IsValidStage(PipeLineStage stage)
@@ -40,5 +42,5 @@ bool CommandRenderPass::IsValidStage(PipeLineStage stage)
 
 CommandShader* CommandRenderPass::GetRenderPassShader(PipeLineStage stage)
 {
-	return &m_renderPass[static_cast<uint8_t>(stage)];
+	return m_renderPass[static_cast<uint8_t>(stage)];
 }

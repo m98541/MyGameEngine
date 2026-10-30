@@ -21,8 +21,14 @@ public:
 	CommandManager();
 	~CommandManager();
 
-	bool RenderPassFileLoad(eastl::string filePath);
-	bool RenderPassFileCompileAndSave(eastl::string filePath, eastl::string passFileName, eastl::string shaderFileName,ShaderCompiler::API useAPI);
+	/*
+		RenderPass 파일 내부에 ShaderTable 파일 경로 담음
+		파일 로드 과정에서 기존 쉐이더 테이블 과의 병합 필요 => 해당 기능은 주로 엔진 쪽에서 사용할 예정
+		이때문에 에티터 에서는 현재의 상태초기화 위한 clear 명령 필요
+	*/
+	bool RenderPassFileLoad(eastl::string renderPassFilePath);
+	bool RenderPassFileCompileAndSave(eastl::string filePath, eastl::string passFileName, eastl::string 
+		,ShaderCompiler::API useAPI);
 
 	//bool registerShader(CommandShader& shader);
 	bool RegisterRenderPass( // invalid 쉐이더의 경우 nullptr 전달 사용자가 의식적으로 전달해야함

@@ -7,6 +7,15 @@
 #include <fstream>
 #include <string>
 
+eastl::string RenderPassInfoIO::GetShaderTableFilePath()
+{
+	return m_shdaerTableFilePath.c_str();
+}
+void RenderPassInfoIO::SetShaderTableFilePath(eastl::string shaderFilePath)
+{
+	m_shdaerTableFilePath = shaderFilePath;
+}
+
 void RenderPassInfoIO::ReadRenderPassInfo(const char* jsonFilePath)
 {
 	std::ifstream file(jsonFilePath);
@@ -19,6 +28,15 @@ void RenderPassInfoIO::ReadRenderPassInfo(const char* jsonFilePath)
 		//assert! json 파싱 에러
 	}
 	const rapidjson::Value& jsonValue = jsonDoc;
+
+	if (jsonValue.HasMember(KEY_SHADER_TABLE_FILE_PATH))
+	{
+		m_shdaerTableFilePath = jsonValue[KEY_SHADER_TABLE_FILE_PATH].GetString();
+	}
+	else
+	{
+
+	}
 
 	m_renderPassList.clear();
 
@@ -36,7 +54,7 @@ void RenderPassInfoIO::ReadRenderPassInfo(const char* jsonFilePath)
 			{
 				RenderPassInfo element;
 				element.ReadJsonObject(arr[i]);
-				m_renderPassList[element.renderPassId] = element;
+				m_renderPassList[element.m_renderPassId] = element;
 			}
 
 		}
@@ -64,9 +82,12 @@ void RenderPassInfoIO::WriteRenderPassInfo(const char* jsonFileName, const char*
 	rapidjson::Writer<rapidjson::StringBuffer> writer(stringBuffer);
 
 	writer.StartObject();
+
+	writer.Key(KEY_SHADER_TABLE_FILE_PATH);
+	writer.String(m_shdaerTableFilePath.c_str());
+
 	writer.Key(KEY_RENDER_PASS_LIST);
 	writer.StartArray();
-	
 	for (const auto& renderPassInfo : m_renderPassList)
 	{
 		renderPassInfo.second.WriteJsonObject(writer);
@@ -108,9 +129,9 @@ const
 
 }
 
-void RenderPassInfoIO::SetRenderPassMaterialTag(eastl::string id, eastl::string materialTag)
+void RenderPassInfoIO::SetRenderPassMaterialTag(eastl::string id, eastl::string m_materialTag)
 {
-	m_renderPassList[id].materialTag = materialTag;
+	m_renderPassList[id].m_materialTag = m_materialTag;
 }
 
 void RenderPassInfoIO::SetRenderPass(eastl::string id, RenderPassInfo element)

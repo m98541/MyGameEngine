@@ -104,6 +104,8 @@ int main(void)
                 else
                 {
                     passPath = tempInput.c_str();
+                    mainCmdManager.RenderPassFileLoad(passPath);
+
                 }
 
             } while (!inputSuccessed);
@@ -163,6 +165,7 @@ int main(void)
 
             // 아래에서 만든 쉐이더들 포인터를 임시적으로 들고 있는 RenderPass 
             CommandRenderPass tempRenderPass(passName);
+            CommandShader tempRenderPassShaderData[static_cast<uint8_t>(PipeLineStage::COUNT)];
 
             //파이프의 스테이지 별 쉐이더 입력 필수 쉐이더는 무조건 입력 나머지는 선택 입력
             for (size_t i = 1; i < PipeLineStageCnt(); i++)
@@ -218,7 +221,8 @@ int main(void)
                     } while (!inputSuccessed);
 
                     CommandShader shader(inputFilePath, entryPoint , stage , renderPassProfile);
-                    tempRenderPass.SetRenderPassShader(shader);
+                    tempRenderPassShaderData[i] = shader;
+                    tempRenderPass.SetRenderPassShader(&tempRenderPassShaderData[i]);
 
                 }
                 else if ( PipeLineStage::Vertex == static_cast<PipeLineStage>(i) || PipeLineStage::Pixel == static_cast<PipeLineStage>(i))

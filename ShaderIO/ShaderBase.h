@@ -115,6 +115,11 @@ inline size_t PipeLineStageCnt()
 	return static_cast<size_t>(PipeLineStage::COUNT);
 }
 
+inline PipeLineStage& operator++(PipeLineStage& stage) {
+	stage = static_cast<PipeLineStage>(static_cast<uint8_t>(stage) + 1);
+	return stage;
+}
+
 inline eastl::string GetPipeLineStageString(PipeLineStage stage)
 {
 	static const eastl::string Vertex = "Vertex";
@@ -134,6 +139,23 @@ inline eastl::string GetPipeLineStageString(PipeLineStage stage)
 	default: return Unknown;
 	}
 }
+
+
+
+
+
+
+
+/*
+쉐이더로 부터 리플랙션을 통해 받은 정보를 직접적으로 바로 사용하고 
+정적으로 유한개의 정해진 버전이 아닌 여러 버전을 유연하게 관리하기위해 
+이전의 HLSL_5_0 으로 enum class 로 고정하여 사용 하던 구조에서 
+struct 가 platform 정보 major 버전 정보 minor 버전 정보를 따로 관리하도록 하고 
+이에 대한 지원함수를 통해 최종 입력 string 변환 을 기능 제공 필요함
+
+현재는 스테이별로 있는 각각의 쉐이더별 관리 체계가 아닌 렌더 페스간 관리 체계임으로
+stage 정보는 기존 방식으로 따로 관리
+*/
 
 enum class ShaderProfileVersion :uint8_t
 {

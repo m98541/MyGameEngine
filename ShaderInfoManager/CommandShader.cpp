@@ -17,6 +17,14 @@ CommandShader::CommandShader(
 	m_profileVersion = profileVersion;
 }
 
+CommandShader::CommandShader(ShaderInfo shader)
+{
+	m_orgFilePath = shader.m_shaderFilePath;
+	m_orgEntryPoint = shader.m_entryPoint;
+	m_stage = shader.m_stage;
+	m_profileVersion = shader.m_targetProfileVersion;
+}
+
 eastl::string CommandShader::GetFilePath()
 {
 	return m_orgFilePath;

@@ -71,6 +71,8 @@ bool D3D11Compiler::ShaderCompile(
 	{
 		// shader 정보 주출 
 		ShaderReflection(shaderInfo , shaderInfoDesc);
+		shaderInfo.m_entryPoint = entryPoint;
+		shaderInfo.m_targetProfileVersion = targetProfile;
 		shaderInfo.m_shaderFilePath = ToUtf8String(hlslFilePath);
 		shaderInfo.m_shaderIRFilePath = ToUtf8String(outputBinPath);
 	}

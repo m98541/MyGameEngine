@@ -103,15 +103,19 @@ public:
 	void WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const;
 	void ReadJsonObject(const rapidjson::Value& jsonValue);
 
+	bool IsValidStage(PipeLineStage stage);
+
 	static constexpr const char* KEY_RENDER_PASS_ID = "renderPassId";
 	static constexpr const char* KEY_MATERIAL_TAG = "materialTag";
 	static constexpr const char* KEY_PASS_INPUT_CONTEXT = "passInputContext";
 	static constexpr const char* KEY_PIPELINES = "pipeLines";
+	
 
-	eastl::string renderPassId;
-	eastl::string materialTag;
+	eastl::string m_renderPassId;
+	eastl::string m_materialTag;
+	
 private:
-
+	
 	PassInputLayoutContext m_passInputContext;
 	eastl::array<PassElement, static_cast<size_t>(PipeLineStage::COUNT)> m_pipeLines;
 };

@@ -1,12 +1,19 @@
 #include "RenderPassInfo.h"
 
+
+bool RenderPassInfo::IsValidStage(PipeLineStage stage)
+{
+	return m_pipeLines[static_cast<uint8_t>(stage)].isValid;
+}
+
+
 void RenderPassInfo::SetShader(PipeLineStage stage, const ShaderInfo& shader)
 {
 	if (stage == shader.m_stage)
 	{
-		m_pipeLines[static_cast<int>(stage)].isValid = true;
-		m_pipeLines[static_cast<int>(stage)].shaderId = shader.m_id;
-		m_pipeLines[static_cast<int>(stage)].stage = stage;
+		m_pipeLines[static_cast<uint8_t>(stage)].isValid = true;
+		m_pipeLines[static_cast<uint8_t>(stage)].shaderId = shader.m_id;
+		m_pipeLines[static_cast<uint8_t>(stage)].stage = stage;
 	}
 	else
 	{
@@ -279,13 +286,15 @@ void RenderPassInfo::WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>&
 	writer.StartObject();
 
 	writer.Key(KEY_RENDER_PASS_ID);
-	writer.String(renderPassId.c_str());
+	writer.String(m_renderPassId.c_str());
 
 	writer.Key(KEY_MATERIAL_TAG);
-	writer.String(materialTag.c_str());
+	writer.String(m_materialTag.c_str());
 
 	writer.Key(KEY_PASS_INPUT_CONTEXT);
 	m_passInputContext.WriteJsonObject(writer);
+
+	
 
 	writer.Key(KEY_PIPELINES);
 	writer.StartArray();
@@ -314,7 +323,7 @@ void RenderPassInfo::ReadJsonObject(const rapidjson::Value& jsonValue)
 
 	if (jsonValue.HasMember(KEY_RENDER_PASS_ID))
 	{
-		renderPassId = jsonValue[KEY_RENDER_PASS_ID].GetString();
+		m_renderPassId = jsonValue[KEY_RENDER_PASS_ID].GetString();
 	}
 	else
 	{
@@ -323,7 +332,7 @@ void RenderPassInfo::ReadJsonObject(const rapidjson::Value& jsonValue)
 
 	if (jsonValue.HasMember(KEY_MATERIAL_TAG))
 	{
-		materialTag = jsonValue[KEY_MATERIAL_TAG].GetString();
+		m_materialTag = jsonValue[KEY_MATERIAL_TAG].GetString();
 	}
 	else
 	{
@@ -343,8 +352,8 @@ void RenderPassInfo::ReadJsonObject(const rapidjson::Value& jsonValue)
 	
 	if (jsonValue.HasMember(KEY_PIPELINES))
 	{
-		const auto& arr = jsonValue["pipeLines"].GetArray();
-		for (int i = 0; i < arr.Size(); i++)
+		const auto& arr = jsonValue[KEY_PIPELINES].GetArray();
+		for (int i = 1; i < arr.Size(); i++)
 		{
 			m_pipeLines[i].ReadJsonObject(arr[i]);
 		}
@@ -353,4 +362,5 @@ void RenderPassInfo::ReadJsonObject(const rapidjson::Value& jsonValue)
 	{
 
 	}
+
 }
