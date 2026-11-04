@@ -13,7 +13,6 @@
 #include "CommandList.h"
 #include "CommandManager.h"
 
-
 #include <iostream>
 #include <string>
 #include <limits>
@@ -115,54 +114,105 @@ int main(void)
         {
             ShaderProfileVersion renderPassProfile;
 
-            bool successedPassProfileInput = false;
+            bool successedShaderPlatformInput = false;
             do
             {
-                std::cout << "Select Render Pass Profile Version (please input index number 1 2 3 ..)\n=>";
-                for (size_t i = 0; i < ShaderProfileVersionCnt(); i++)
+                std::cout << "Select Shader Platform \n=>";
+                for (uint8_t i = 1; i < static_cast<uint8_t>(ShaderPlatform::COUNT); i++)
                 {
-                    std::cout << i << ":" << GetShaderProfileVersionString(static_cast<ShaderProfileVersion>(i)).c_str() << ", ";
+                    std::cout << GetShaderPlatformTag(static_cast<ShaderPlatform>(i)).c_str() <<"[" << (int)i << "]" << ", ";
                 }
                 std::cout << "\n" << ">>";
                 int selectIndex;
                 std::cin >> selectIndex;
 
-                if (!std::cin.fail() && selectIndex >= 0 && selectIndex < ShaderProfileVersionCnt())
+                if (!std::cin.fail() && selectIndex >= 0 && selectIndex < static_cast<uint8_t>(ShaderPlatform::COUNT))
                 {
-                    successedPassProfileInput = true;
-                    renderPassProfile = static_cast<ShaderProfileVersion>(selectIndex);
+                    successedShaderPlatformInput = true;
+                    renderPassProfile.shaderPlatform = static_cast<ShaderPlatform>(selectIndex);
+                    std::cin.clear();
                     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 }
                 else
                 {
-                    std::cout << "fault input Please Retry Select Render Pass Profile Version.\n";
+                    std::cout << "fault input Please Retry Select Shader Platform.\n";
                 }
 
                 std::cin.clear();
 
-            } while (!successedPassProfileInput); // 똑바로 입력 할때까지 시도하게 하기
+            } while (!successedShaderPlatformInput); // 똑바로 입력 할때까지 시도하게 하기
+            
+
+            bool majorSuccessed = false;
+            bool minorSuccessed = false;
+            int majorVer, minorVer;
+
+            do
+            {   
+                std::cout << "Please Input Shader Version \n";
+             
+                
+                if (!majorSuccessed)
+                {
+                    majorSuccessed = true;
+                    std::cout << "major version :";
+                    std::cin >> majorVer;
+                    if (std::cin.fail())
+                    {
+                        majorSuccessed = false;
+                        std::cin.clear();
+                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                        std::cout << "fault input Please Retry Input Major Version.\n";
+                        continue;
+                    }
+                }
+                
+                if (!minorSuccessed)
+                {
+                    minorSuccessed = true;
+                    std::cout << std::endl << "minor version :";
+                    std::cin >> minorVer;
+                    
+                    if (std::cin.fail())
+                    {
+                        std::cin.clear();
+                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                        minorSuccessed = false;
+                        std::cout << "fault input Please Retry Input Minor Version.\n";
+                    }
+      
+                }
+      
+            } while (!minorSuccessed && !majorSuccessed);
+
+            renderPassProfile.majorVer = (uint8_t)majorVer;
+            renderPassProfile.minorVer = (uint8_t)minorVer;
             
 
             //페스 이름 지정
             bool inputSuccessed = true;
-            std::cin.clear();
+            std::cin.ignore();
+            
             eastl::string passName;
+
             do
             {
                 std::cout << "please input Render Pass Name\n";
                 std::cout << "pass name :";
-                if (!std::getline(std::cin, tempInput) || input.empty())
+                if (!std::getline(std::cin, tempInput) || tempInput.empty())
                 {
                     inputSuccessed = false;
                     std::cout << "fault input Please Retry.\n";
                 }
                 else
                 {
+                    inputSuccessed = true;
                     passName = tempInput.c_str();
                 }
 
             } while (!inputSuccessed);
 
+            
             // 아래에서 만든 쉐이더들 포인터를 임시적으로 들고 있는 RenderPass 
             CommandRenderPass tempRenderPass(passName);
             CommandShader tempRenderPassShaderData[static_cast<uint8_t>(PipeLineStage::COUNT)];
@@ -198,6 +248,7 @@ int main(void)
                         }
                         else
                         {
+                            inputSuccessed = true;
                             inputFilePath = tempInput.c_str();
                         }
                         
@@ -208,13 +259,14 @@ int main(void)
                     {
                         std::cout << "please input shader entryPoint info \n";
                         std::cout << "entry Point :";
-                        if (!std::getline(std::cin, tempInput) || input.empty())
+                        if (!std::getline(std::cin, tempInput) || tempInput.empty())
                         {
                             inputSuccessed = false;
                             std::cout << "fault input Please Retry.\n";
                         }
                         else
                         {
+                            inputSuccessed = true;
                             entryPoint = tempInput.c_str();
                         }
 
@@ -295,19 +347,20 @@ int main(void)
             do
             {
                 std::cout << "file name :";
-                if (!std::getline(std::cin, tempInput) || input.empty())
+                if (!std::getline(std::cin, tempInput) || tempInput.empty())
                 {
                     inputSuccessed = false;
                     std::cout << "fault input Please Retry.\n";
                 }
                 else
                 {
+                    inputSuccessed = true;
                     fileName = tempInput.c_str();
                 }
 
             } while (!inputSuccessed);
 
-            mainCmdManager.RenderPassFileCompileAndSave("ShaderResource/",fileName + ".pass", fileName + ".ShaderTable", ShaderCompiler::API::D3D11);
+            mainCmdManager.RenderPassFileCompileAndSave("ShaderResource",fileName + ".pass", fileName + ".ShaderTable", ShaderCompiler::API::D3D11);
             
         }
         else 

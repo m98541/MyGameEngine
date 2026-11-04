@@ -2,7 +2,7 @@
 #include "../GameEngine/Base.h"
 #include "../ShaderIO/RenderPassInfoIO.h"
 #include "../ShaderIO/ShaderInfoIO.h"
-#include "../StringFormatAssert/StringFormatAssert.h"
+#include "../StringFormat/StringFormatAssert.h"
 
 
 #include <string>
@@ -309,6 +309,7 @@ bool CommandManager::RenderPassFileCompileAndSave(eastl::string filePath, eastl:
 
 			SF_ASSERTE(resultShdaerCompile , "Assert Shader Compile Fail /pass %s /stage %s ", cmdRenderPass.GetRenderPassName().c_str(), GetPipeLineStageString(stage).c_str());
 			shader.m_id = cmdShader->GetFilePath();
+			shader.m_targetProfileVersion = cmdShader->GetProfileVersion();
 			shader.m_stage = stage;
 			if (stage == PipeLineStage::Vertex)
 			{
@@ -368,7 +369,7 @@ bool CommandManager::RenderPassFileCompileAndSave(eastl::string filePath, eastl:
 	
 	// file IO 단계 쉐이더 테이블 과 렌더 패스 테이블 파일 최종 저장
 	shaderIO.WriteShaderInfo(filePath.c_str(), shaderFileName.c_str());
-	renderPassInfoIO.SetShaderTableFilePath((filePath + "/" + shaderFileName).c_str());
+	renderPassInfoIO.SetShaderTableFilePath((filePath + "\\" + shaderFileName).c_str());
 	renderPassInfoIO.WriteRenderPassInfo(passFileName.c_str(), filePath.c_str());
 
 

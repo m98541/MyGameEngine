@@ -1,6 +1,7 @@
 #include "ShaderInfo.h"
 #include <codecvt>
 #include <locale>
+#include "../StringFormat/StringFormatAssert.h"
 
 uint32_t GlobalVariableType::GetByteSize() const
 {
@@ -109,7 +110,8 @@ void ShaderInfo::WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& wri
 
 
 	writer.Key(KEY_TARGET_PROFILE_VERSION);
-	writer.Uint(static_cast<unsigned int>(m_targetProfileVersion));
+	m_targetProfileVersion.WriteJsonObject(writer);
+	//writer.Uint(static_cast<unsigned int>(m_targetProfileVersion));
 
 	writer.Key(KEY_ENTRY_POINT);
 	writer.String(m_entryPoint.c_str());
@@ -289,7 +291,7 @@ void ShaderInfo::ReadJsonObject(const rapidjson::Value& jsonValue)
 
 	if (jsonValue.HasMember(KEY_TARGET_PROFILE_VERSION))
 	{		
-		m_targetProfileVersion =static_cast<ShaderProfileVersion>(jsonValue[KEY_TARGET_PROFILE_VERSION].GetUint());
+		m_targetProfileVersion.ReadJsonObject(jsonValue[KEY_TARGET_PROFILE_VERSION]);
 	}
 
 
@@ -383,7 +385,7 @@ void ShaderIOLayoutElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+	//	SF_ASSERTE(jsonValue.HasMember(KEY_NAME) , "not found KEY : %s ", KEY_NAME);
 	}
 
 	if (jsonValue.HasMember(KEY_SYSTEM_VALUE))
@@ -392,7 +394,7 @@ void ShaderIOLayoutElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+	//	SF_ASSERTE(jsonValue.HasMember(KEY_SYSTEM_VALUE), "not found KEY : %s ", KEY_SYSTEM_VALUE);
 	}
 
 	if (jsonValue.HasMember(KEY_SEMANTIC_INDEX))
@@ -401,7 +403,7 @@ void ShaderIOLayoutElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+	//	SF_ASSERTE(jsonValue.HasMember(KEY_SEMANTIC_INDEX), "not found KEY : %s ", KEY_SEMANTIC_INDEX);
 	}
 
 	if (jsonValue.HasMember(KEY_LOCATION))
@@ -410,7 +412,7 @@ void ShaderIOLayoutElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+	//	SF_ASSERTE(jsonValue.HasMember(KEY_LOCATION), "not found KEY : %s ", KEY_LOCATION);
 	}
 
 
@@ -826,7 +828,7 @@ void ResourceBindingElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 
 	if (jsonValue.HasMember(KEY_BINDING_COUNT))
 	{
-		binding = static_cast<uint32_t>(jsonValue[KEY_BINDING_COUNT].GetUint());
+		bindingCount = static_cast<uint32_t>(jsonValue[KEY_BINDING_COUNT].GetUint());
 	}
 	else
 	{
@@ -835,4 +837,57 @@ void ResourceBindingElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 
 
 
+}
+
+void ShaderProfileVersionInfo::WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const
+{
+	writer.StartObject();
+	writer.Key(KEY_SHADER_PLATFORM);
+	writer.Uint(static_cast<unsigned int>(shaderPlatform));
+	writer.Key(KEY_MAJOR_VER);
+	writer.Uint(static_cast<unsigned int>(majorVer));
+	writer.Key(KEY_MINOR_VER);
+	writer.Uint(static_cast<unsigned int>(minorVer));
+	writer.EndObject();
+}
+
+void ShaderProfileVersionInfo::ReadJsonObject(const rapidjson::Value& jsonValue)
+{
+	if (!jsonValue.IsObject())
+	{
+		if (jsonValue.IsArray())
+			assert(false && "shader jsonValue read fail - jsonValue type: Array! (Object type required) | ShaderInfo.cpp\ReadRadpidJson");
+		else if (jsonValue.IsNull())
+			assert(false && "shader jsonValue read fail - jsonValue is Null! | ShaderInfo.cpp\ReadRadpidJson");
+		else
+			assert(false && "shader jsonValue read fail - jsonValue type is not Object (Object type required) | ShaderInfo.cpp\ReadRadpidJson");
+	}
+
+	if (jsonValue.HasMember(KEY_SHADER_PLATFORM))
+	{
+		shaderPlatform = static_cast<ShaderPlatform>(jsonValue[KEY_SHADER_PLATFORM].GetUint());
+	}
+	else
+	{
+		SF_ASSERTE(jsonValue.HasMember(KEY_SHADER_PLATFORM), "not found KEY : %s ", KEY_SHADER_PLATFORM);
+	}
+
+	if (jsonValue.HasMember(KEY_MAJOR_VER))
+	{
+		majorVer = static_cast<uint8_t>(jsonValue[KEY_MAJOR_VER].GetUint());
+	}
+	else
+	{
+		SF_ASSERTE(jsonValue.HasMember(KEY_MAJOR_VER), "not found KEY : %s ", KEY_MAJOR_VER);
+	}
+
+	
+	if (jsonValue.HasMember(KEY_MINOR_VER))
+	{
+		minorVer = static_cast<uint8_t>(jsonValue[KEY_MINOR_VER].GetUint());
+	}
+	else
+	{
+		SF_ASSERTE(jsonValue.HasMember(KEY_MINOR_VER), "not found KEY : %s ", KEY_MINOR_VER);
+	}
 }

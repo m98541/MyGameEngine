@@ -2,7 +2,7 @@
 #include <Windows.h>
 #include <EASTL/vector.h>
 #include <EASTL/map.h>
-#include "../StringFormatAssert/StringFormatAssert.h"
+#include "../StringFormat/StringFormatAssert.h"
 
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "dxguid.lib")
@@ -72,7 +72,6 @@ bool D3D11Compiler::ShaderCompile(
 		// shader 정보 주출 
 		ShaderReflection(shaderInfo , shaderInfoDesc);
 		shaderInfo.m_entryPoint = entryPoint;
-		shaderInfo.m_targetProfileVersion = targetProfile;
 		shaderInfo.m_shaderFilePath = ToUtf8String(hlslFilePath);
 		shaderInfo.m_shaderIRFilePath = ToUtf8String(outputBinPath);
 	}
@@ -112,9 +111,12 @@ void D3D11Compiler::ShaderReflection(ShaderInfo& shaderInfo, ShaderInfoDesc& sha
 	
 
 	shaderInfo.m_stage = D3D11VersionToPipeLineStage(
-		static_cast<D3D11_SHADER_VERSION_TYPE>(orgD3D11ShaderDESC.Version)
+		static_cast<D3D11_SHADER_VERSION_TYPE>(D3D11_SHVER_GET_TYPE(orgD3D11ShaderDESC.Version))
 	);
 
+	shaderInfo.m_targetProfileVersion.majorVer = D3D11_SHVER_GET_MAJOR(orgD3D11ShaderDESC.Version);
+	
+	shaderInfo.m_targetProfileVersion.minorVer = D3D11_SHVER_GET_MINOR(orgD3D11ShaderDESC.Version);
 
 	ConstantBufferReflection(shaderInfo , shaderInfoDesc , orgD3D11ShaderDESC);
 	IoSignatureReflection(shaderInfo, shaderInfoDesc, orgD3D11ShaderDESC);
