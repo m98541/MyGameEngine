@@ -172,6 +172,23 @@ struct ShaderInfoDesc
 
 };
 
+struct ShaderProfileVersionInfo : ShaderProfileVersion
+{
+
+	void WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>& writer) const;
+	void ReadJsonObject(const rapidjson::Value& jsonValue);
+
+	static constexpr const char* KEY_SHADER_PLATFORM = "shaderPlatform";
+	static constexpr const char* KEY_MAJOR_VER = "majorVer";
+	static constexpr const char* KEY_MINOR_VER = "minorVer";
+
+	ShaderProfileVersionInfo& operator=(const ShaderProfileVersion& other)
+	{
+		ShaderProfileVersion::operator=(other);
+		return *this;
+	}
+
+};
 
 struct ShaderInfo
 {
@@ -188,7 +205,7 @@ struct ShaderInfo
 
 	eastl::vector<ResourceBindingElement> m_samplers;
 
-	ShaderProfileVersion m_targetProfileVersion;
+	ShaderProfileVersionInfo m_targetProfileVersion;
 
 	eastl::string m_entryPoint;
 	eastl::string m_shaderFilePath;

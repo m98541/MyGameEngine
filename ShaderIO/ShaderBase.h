@@ -6,6 +6,7 @@
 	* 엔진 내부에 각각의 그래픽 모듈에서 변환 장치 필요함
 */
 #include <EASTL/string.h>
+#include "../StringFormat/EASTLStringFormat.h"
 
 enum class PRIMITIVE_TOPOLOGY : uint8_t
 {
@@ -156,82 +157,60 @@ struct 가 platform 정보 major 버전 정보 minor 버전 정보를 따로 관
 현재는 스테이별로 있는 각각의 쉐이더별 관리 체계가 아닌 렌더 페스간 관리 체계임으로
 stage 정보는 기존 방식으로 따로 관리
 */
-
-enum class ShaderProfileVersion :uint8_t
+enum class ShaderPlatform: uint8_t
 {
-	//HLSL Ver
-	//DX11
-	HLSL_5_0,
-	//DX12
-	HLSL_5_1,
-	HLSL_6_0,
-	HLSL_6_5,
-	HLSL_6_6,
+	Unknown = 0,
+	HLSL,
+COUNT};
 
-	/*
-	//GLSL Ver
-	GLSL_330,
-	GLSL_430,//Compute Shader 도입
-	GLSL_450,
-	GLSL_460
-	*/
-COUNT
-};
-
-inline size_t ShaderProfileVersionCnt()
+inline eastl::string GetShaderPlatformTag(ShaderPlatform platform)
 {
-	return static_cast<size_t>(ShaderProfileVersion::COUNT);
+	eastl::string platformTag;
+	switch (platform)
+	{
+	case ShaderPlatform::HLSL:
+		platformTag = "HLSL";
+		break;
+	case ShaderPlatform::Unknown:
+	default:
+		platformTag = "Unknown";
+		break;
+	}
+
+	return platformTag.c_str();
 }
 
-inline eastl::string GetShaderProfileVersionString(ShaderProfileVersion version)
+struct ShaderProfileVersion
 {
-	static const eastl::string Unknown = "Unknown";
+	ShaderPlatform shaderPlatform;
+	uint8_t majorVer;
+	uint8_t minorVer;
+};
 
-	static const eastl::string HLSL_5_0 = "HLSL_5_0";
 
-	static const eastl::string HLSL_5_1 = "HLSL_5_1";
 
-	static const eastl::string HLSL_6_0 = "HLSL_5_0";
-	static const eastl::string HLSL_6_5 = "HLSL_6_5";
-	static const eastl::string HLSL_6_6 = "HLSL_6_6";
-
-	switch (version)
-	{
-	case ShaderProfileVersion::HLSL_5_0: return HLSL_5_0;
-	case ShaderProfileVersion::HLSL_5_1: return HLSL_5_1;
-	case ShaderProfileVersion::HLSL_6_0: return HLSL_6_0;
-	case ShaderProfileVersion::HLSL_6_5: return HLSL_6_5;
-	case ShaderProfileVersion::HLSL_6_6: return HLSL_6_6;
-	default: return Unknown;
-	}
+inline eastl::string GetHLSLShaderProfileVersionString(ShaderProfileVersion version)
+{
+	return EASTLsprintf32("%s_%d_%d", GetShaderPlatformTag(version.shaderPlatform).c_str(), version.majorVer, version.minorVer);
 }
 
 
 inline eastl::string GetHLSLTargetString(PipeLineStage stage, ShaderProfileVersion version)
 {
-	eastl::string stagePrefix;
+	
 	switch (stage)
 	{
-	case PipeLineStage::Vertex:   stagePrefix = "vs_"; break;
-	case PipeLineStage::Hull:     stagePrefix = "hs_"; break;
-	case PipeLineStage::Domain:   stagePrefix = "ds_"; break;
-	case PipeLineStage::Geometry: stagePrefix = "gs_"; break;
-	case PipeLineStage::Pixel:    stagePrefix = "ps_"; break;
-	default: return "";
+	case PipeLineStage::Vertex:   return EASTLsprintf32("vs_%d_%d", version.majorVer, version.minorVer);
+	case PipeLineStage::Hull:	  return EASTLsprintf32("hs_%d_%d", version.majorVer, version.minorVer);
+	case PipeLineStage::Domain:   return EASTLsprintf32("ds_%d_%d", version.majorVer, version.minorVer);
+	case PipeLineStage::Geometry: return EASTLsprintf32("gs_%d_%d", version.majorVer, version.minorVer);
+	case PipeLineStage::Pixel:	  return EASTLsprintf32("ps_%d_%d", version.majorVer, version.minorVer);
+	default: return "UnknownStage_";// error
 	}
 
-	eastl::string versionStr;
-	switch (version)
-	{
-	case ShaderProfileVersion::HLSL_5_0: versionStr = "5_0"; break;
-	case ShaderProfileVersion::HLSL_5_1: versionStr = "5_1"; break;
-	case ShaderProfileVersion::HLSL_6_0: versionStr = "6_0"; break;
-	case ShaderProfileVersion::HLSL_6_5: versionStr = "6_5"; break;
-	case ShaderProfileVersion::HLSL_6_6: versionStr = "6_6"; break;
-	default: return "";
-	}
+	
 
-	return (stagePrefix + versionStr).c_str(); 
+	
 };
 
 

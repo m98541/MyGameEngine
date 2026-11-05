@@ -1,32 +1,68 @@
-# Prerequisites
-*.d
+# ==========================================
+# Visual Studio 필수 제외 파일 (개인 설정 및 캐시)
+# ==========================================
+.vs/
+*.suo
+*.user
+*.userosv
+*.userprefs
+*.db
+*.opendb
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
+# ==========================================
+# 빌드 출력 디렉터리 (바이너리 및 중간 산출물)
+# ==========================================
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+logs/
+
+# 프로젝트별 중간/빌드 폴더
+intermediate/
+Intermediate/
+build/
+Build/
+
+# ==========================================
+# 컴파일러 생성 임시 파일
+# ==========================================
 *.obj
-
-# Precompiled Headers
-*.gch
+*.o
 *.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
+*.idb
+*.pdb
+*.ilk
+*.tlog
+*.manifest
+*.res
+*.exp
 *.lib
-
-# Executables
+*.dll
 *.exe
-*.out
-*.app
+
+# ==========================================
+# C++ 코드 분석, 프로파일링 및 진단 도구 캐시
+# ==========================================
+*.ipch
+*.aps
+*.log
+*.tlog
+*.lastcodeanalysissucceeded
+*.CodeAnalysisLog.xml
+
+# ==========================================
+# 프로젝트 구조 및 필터 보존 규칙 (중요)
+# ==========================================
+# 솔루션 탐색기의 가상 폴더(필터) 트리를 협업/병합 시 유지하기 위해 필수로 트래킹해야 합니다.
+!*.sln
+!*.vcxproj
+!*.vcxproj.filters

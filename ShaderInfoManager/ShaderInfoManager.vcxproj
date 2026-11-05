@@ -123,13 +123,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CommandManager.cpp" />
+    <ClCompile Include="CommandRenderPass.cpp" />
+    <ClCompile Include="CommandShader.cpp" />
     <ClCompile Include="D3D11Compiler.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ShaderCompile.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CommandList.h" />
+    <ClInclude Include="CommandManager.h" />
+    <ClInclude Include="CommandRenderPass.h" />
+    <ClInclude Include="CommandShader.h" />
     <ClInclude Include="D3D11Compiler.h" />
     <ClInclude Include="ShaderCompiler.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ShaderIO\ShaderIO.vcxproj">
+      <Project>{df485ce1-959b-41fe-b8c4-1b1b333be932}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\StringFormat\StringFormat.vcxproj">
+      <Project>{aeefcd36-9af1-4376-89c6-6ca6bd899027}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
