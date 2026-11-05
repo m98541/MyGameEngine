@@ -33,10 +33,10 @@
     <ClCompile Include="CommandShader.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="CommandRenderPass.cpp">
+    <ClCompile Include="CommandManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="CommandManager.cpp">
+    <ClCompile Include="CommandRenderPass.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
