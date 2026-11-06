@@ -346,6 +346,9 @@ void ShaderIOLayoutElement::WriteJsonObject(rapidjson::Writer<rapidjson::StringB
 	writer.Key(KEY_NAME);
 	writer.String(semanticName.c_str());
 
+	writer.Key(KEY_SEMANTIC_INDEX);
+	writer.Uint(static_cast<unsigned int>(semanticIndex));
+
 	writer.Key(KEY_SYSTEM_VALUE);
 	writer.Bool(systemValue);
 
@@ -385,7 +388,7 @@ void ShaderIOLayoutElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-	//	SF_ASSERTE(jsonValue.HasMember(KEY_NAME) , "not found KEY : %s ", KEY_NAME);
+		SF_ASSERTE(jsonValue.HasMember(KEY_NAME) , "not found KEY : %s ", KEY_NAME);
 	}
 
 	if (jsonValue.HasMember(KEY_SYSTEM_VALUE))
@@ -394,7 +397,7 @@ void ShaderIOLayoutElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-	//	SF_ASSERTE(jsonValue.HasMember(KEY_SYSTEM_VALUE), "not found KEY : %s ", KEY_SYSTEM_VALUE);
+		SF_ASSERTE(jsonValue.HasMember(KEY_SYSTEM_VALUE), "not found KEY : %s ", KEY_SYSTEM_VALUE);
 	}
 
 	if (jsonValue.HasMember(KEY_SEMANTIC_INDEX))
@@ -403,7 +406,7 @@ void ShaderIOLayoutElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-	//	SF_ASSERTE(jsonValue.HasMember(KEY_SEMANTIC_INDEX), "not found KEY : %s ", KEY_SEMANTIC_INDEX);
+		SF_ASSERTE(jsonValue.HasMember(KEY_SEMANTIC_INDEX), "not found KEY : %s ", KEY_SEMANTIC_INDEX);
 	}
 
 	if (jsonValue.HasMember(KEY_LOCATION))
@@ -412,7 +415,7 @@ void ShaderIOLayoutElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-	//	SF_ASSERTE(jsonValue.HasMember(KEY_LOCATION), "not found KEY : %s ", KEY_LOCATION);
+		SF_ASSERTE(jsonValue.HasMember(KEY_LOCATION), "not found KEY : %s ", KEY_LOCATION);
 	}
 
 
@@ -454,7 +457,7 @@ void GlobalVariableType::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_FORMAT), "not found KEY : %s ", KEY_FORMAT);
 	}
 
 	if (jsonValue.HasMember(KEY_VARIABLE_CLASS))
@@ -463,7 +466,7 @@ void GlobalVariableType::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_VARIABLE_CLASS), "not found KEY : %s ", KEY_VARIABLE_CLASS);
 	}
 
 
@@ -473,7 +476,7 @@ void GlobalVariableType::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_ELEMENTS_CNT), "not found KEY : %s ", KEY_ELEMENTS_CNT);
 	}
 }
 
@@ -526,7 +529,7 @@ void GlobalVariable::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_VARIABLE_NAME), "not found KEY : %s ", KEY_VARIABLE_NAME);
 	}
 
 	if (jsonValue.HasMember(KEY_BASE_OFFSET))
@@ -535,7 +538,7 @@ void GlobalVariable::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_BASE_OFFSET), "not found KEY : %s ", KEY_BASE_OFFSET);
 	}
 
 
@@ -545,7 +548,7 @@ void GlobalVariable::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_OFFSET), "not found KEY : %s ", KEY_OFFSET);
 	}
 
 	if (jsonValue.HasMember(KEY_BYTE_SIZE))
@@ -554,7 +557,7 @@ void GlobalVariable::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_BYTE_SIZE), "not found KEY : %s ", KEY_BYTE_SIZE);
 	}
 
 	if (jsonValue.HasMember(KEY_VARIABLE_TYPE))
@@ -564,7 +567,7 @@ void GlobalVariable::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_VARIABLE_TYPE), "not found KEY : %s ", KEY_VARIABLE_TYPE);
 	}
 
 	if (jsonValue.HasMember(KEY_VARIABLE_MEMBERS))
@@ -642,7 +645,7 @@ void GlobalVariableBuffer::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_BUFFER_NAME), "not found KEY : %s ", KEY_BUFFER_NAME);
 	}
 
 	if (jsonValue.HasMember(KEY_BUFFER_BYTE_SIZE))
@@ -651,7 +654,7 @@ void GlobalVariableBuffer::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_BUFFER_BYTE_SIZE), "not found KEY : %s ", KEY_BUFFER_BYTE_SIZE);
 	}
 
 
@@ -678,7 +681,7 @@ void GlobalVariableBuffer::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_REG_SPACE), "not found KEY : %s ", KEY_REG_SPACE);
 	}
 
 	if (jsonValue.HasMember(KEY_REG_NUM))
@@ -687,7 +690,7 @@ void GlobalVariableBuffer::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_REG_NUM), "not found KEY : %s ", KEY_REG_NUM);
 	}
 
 	if (jsonValue.HasMember(KEY_SET_NUM))
@@ -696,7 +699,7 @@ void GlobalVariableBuffer::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_SET_NUM), "not found KEY : %s ", KEY_SET_NUM);
 	}
 
 	if (jsonValue.HasMember(KEY_BINDING))
@@ -705,7 +708,7 @@ void GlobalVariableBuffer::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_BINDING), "not found KEY : %s ", KEY_BINDING);
 	}
 
 	if (jsonValue.HasMember(KEY_BINDING_COUNT))
@@ -714,7 +717,7 @@ void GlobalVariableBuffer::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_BINDING_COUNT), "not found KEY : %s ", KEY_BINDING_COUNT);
 	}
 
 }
@@ -769,7 +772,7 @@ void ResourceBindingElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_RESOURCE_NAME), "not found KEY : %s ", KEY_RESOURCE_NAME);
 	}
 
 	if (jsonValue.HasMember(KEY_RESOURCE_TYPE))
@@ -778,7 +781,7 @@ void ResourceBindingElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_RESOURCE_TYPE), "not found KEY : %s ", KEY_RESOURCE_TYPE);
 	}
 
 	if (jsonValue.HasMember(KEY_REG_SPACE))
@@ -787,7 +790,7 @@ void ResourceBindingElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_REG_SPACE), "not found KEY : %s ", KEY_REG_SPACE);
 	}
 
 	if (jsonValue.HasMember(KEY_REG_NUM))
@@ -796,7 +799,7 @@ void ResourceBindingElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_REG_NUM), "not found KEY : %s ", KEY_REG_NUM);
 	}
 
 	if (jsonValue.HasMember(KEY_SET_NUM))
@@ -805,7 +808,7 @@ void ResourceBindingElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_SET_NUM), "not found KEY : %s ", KEY_SET_NUM);
 	}
 
 	if (jsonValue.HasMember(KEY_BINDING))
@@ -814,7 +817,7 @@ void ResourceBindingElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_BINDING), "not found KEY : %s ", KEY_BINDING);
 	}
 
 	if (jsonValue.HasMember(KEY_DIMENSION))
@@ -823,7 +826,7 @@ void ResourceBindingElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_DIMENSION), "not found KEY : %s ", KEY_DIMENSION);
 	}
 
 	if (jsonValue.HasMember(KEY_BINDING_COUNT))
@@ -832,7 +835,7 @@ void ResourceBindingElement::ReadJsonObject(const rapidjson::Value& jsonValue)
 	}
 	else
 	{
-
+		SF_ASSERTE(jsonValue.HasMember(KEY_BINDING_COUNT), "not found KEY : %s ", KEY_BINDING_COUNT);
 	}
 
 
