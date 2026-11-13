@@ -106,7 +106,6 @@ public:
 	bool IsValidStage(PipeLineStage stage);
 
 	static constexpr const char* KEY_RENDER_PASS_ID = "renderPassId";
-	static constexpr const char* KEY_MATERIAL_TAG = "materialTag";
 	static constexpr const char* KEY_PASS_INPUT_CONTEXT = "passInputContext";
 	static constexpr const char* KEY_PIPELINES = "pipeLines";
 	

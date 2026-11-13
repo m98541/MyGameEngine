@@ -44,3 +44,4 @@ CommandShader* CommandRenderPass::GetRenderPassShader(PipeLineStage stage)
 {
 	return m_renderPass[static_cast<uint8_t>(stage)];
 }
+

@@ -2,23 +2,26 @@
 #define COMMANDLIST_H
 
 #define COMMAND_MAX_CHAR 30
-#define COMMAND_LIST_CNT 7
+#define COMMAND_LIST_CNT 8
 
 enum CommandEnum {
     EXIT,
     HELP,
     RENDER_PASS_LOAD,
     REGISTER_RENDER_PASS,
+    REGISTER_MATERIAL_TAG,
     VIEW_TABLE_RENDER_PASS,
     VIEW_TABLE_SHADER,
     SAVE_FILE
+
 };
 
 constexpr char CommandListStr[COMMAND_LIST_CNT][COMMAND_MAX_CHAR] = {
        "EXIT",
        "HELP",
        "RENDER_PASS_LOAD",
-       "REGISTER_RENDER_PASS", // 쉐이더 테이블에 등록 하면서 패스 지정
+       "REGISTER_RENDER_PASS",// 쉐이더 테이블에 등록 하면서 패스 지정
+       "REGISTER_REGISTER_TAG",
        "VIEW_TABLE_RENDER_PASS",
        "VIEW_TABLE_SHADER",
        "SAVE_FILE"

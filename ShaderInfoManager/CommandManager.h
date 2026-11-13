@@ -3,6 +3,7 @@
 #include "CommandRenderPass.h"
 #include "CommandShader.h"
 #include "ShaderCompiler.h"
+#include "../ShaderIO/MaterialTagIO.h"
 
 #include <EASTL/vector.h>
 #include <EASTL/unordered_map.h>
@@ -41,6 +42,15 @@ public:
 	// 저장된 랜더 패스이름 벡터 반환
 	eastl::vector<eastl::string> GetRenderPassNames();
 
+
+	void RegisterMaterialTagGroup(MaterialTagGroup materialTagGroup);
+	bool DeleteMaterialTagGroup(eastl::string groupName);
+	//일단은 그룹명(ID) 벡터만 뽑아서 보여주는 방식으로 
+	//나중에 시간 남으면 트리형태 뷰어
+	eastl::vector<eastl::string> ShowMaterialGroupTable();
+	
+
+
 private:
 	// 다음의 경우 render Pass 등록을 위한 내부 호출용
 	// 테이블에 저장된 쉐이더의 주소를 등록과 즉시 반환
@@ -56,6 +66,8 @@ private:
 	// 해당 renderPassTable의 CommandRenderPass은 
 	// shaderTable에 존재하는 CommandShader로만 구현되어야함
 	eastl::unordered_map<eastl::string ,CommandRenderPass> m_renderPassTable;
+
+	MaterialTagGroupTableIO m_materialGroupTable;
 
 };
 

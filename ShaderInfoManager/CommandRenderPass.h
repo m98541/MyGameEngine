@@ -22,11 +22,13 @@ public:
 	// Command 매니저가 필요 SetRenderPassShader 유저 층에 직접 노출이 아닌 Command 매니가 사용해야함
 	CommandShader* SetRenderPassShader(CommandShader* shader);
 	CommandShader* GetRenderPassShader(PipeLineStage stage);
+
 	eastl::string GetRenderPassName();
 	bool IsValidStage(PipeLineStage stage);
 
 private:
 	eastl::string m_passName;
+
 	CommandShader* m_renderPass[static_cast<uint8_t>(PipeLineStage::COUNT)];
 	bool m_validList[static_cast<uint8_t>(PipeLineStage::COUNT)] = { false , false , false ,false , false };
 };

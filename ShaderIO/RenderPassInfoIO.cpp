@@ -20,7 +20,6 @@ void RenderPassInfoIO::ReadRenderPassInfo(const char* jsonFilePath)
 {
 	std::ifstream file(jsonFilePath);
 	std::string tempFileBuffer((std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>()));
-
 	rapidjson::StringStream jsonStringStream(tempFileBuffer.c_str());
 	rapidjson::Document jsonDoc;
 	jsonDoc.ParseStream(jsonStringStream);

@@ -375,3 +375,39 @@ bool CommandManager::RenderPassFileCompileAndSave(eastl::string filePath, eastl:
 
 	return true;
 }
+
+
+void CommandManager::RegisterMaterialTagGroup(MaterialTagGroup materialTagGroup)
+{
+	m_materialGroupTable.tagGroupTable[materialTagGroup.tagGroupId] = materialTagGroup;
+}
+
+eastl::vector<eastl::string> CommandManager::ShowMaterialGroupTable()
+{
+	eastl::vector<eastl::string> groupNames;
+
+	for (const auto& tag : m_materialGroupTable.tagGroupTable)
+	{
+		groupNames.push_back(tag.first);
+	}
+
+	return groupNames;
+}
+
+bool CommandManager::DeleteMaterialTagGroup(eastl::string groupName)
+{
+	if (m_materialGroupTable.tagGroupTable.find(groupName) 
+		!= m_materialGroupTable.tagGroupTable.end())
+	{
+		m_materialGroupTable.tagGroupTable.erase(groupName);
+		return true;
+	}
+	else
+	{
+		return false;
+		//향후 메세지를 알려줄수 있는 result 구조가 필요 
+		//HRESULT 처럼 문자열을 직접 담아 전달하는 방식이 아닌(오버헤드 매우 큼)
+		//예외 상황을 지정해두고(예외에 대한 고민이 필요...) 여기에 따른 코드와 매크로 지원함수를 만들어 주는 형태로
+		//이후 이또한 따로 이슈로 빼어내어 따로 Project 만들어서 진행 필요
+	}
+}
