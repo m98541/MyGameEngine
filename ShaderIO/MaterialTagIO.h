@@ -45,7 +45,8 @@ struct MaterialTagGroupTableIO : MaterialTagGroupTable
 	void WriteInfo(const char* jsonFilePath);
 
 	static constexpr const char* KEY_TAG_GROUP_TABLE = "tagGroupTable";
-	
+	static constexpr const char* FILE_EXTENSION = "MatTable";
+
 	MaterialTagGroupTableIO& operator=(const MaterialTagGroupTable& other)
 	{
 		MaterialTagGroupTable::operator=(other);

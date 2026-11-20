@@ -411,3 +411,20 @@ bool CommandManager::DeleteMaterialTagGroup(eastl::string groupName)
 		//이후 이또한 따로 이슈로 빼어내어 따로 Project 만들어서 진행 필요
 	}
 }
+
+void CommandManager::MaterialTagSaveFile(eastl::string filePath, eastl::string materialFileName)
+{
+	m_materialGroupTable.WriteInfo((filePath + "\\" + materialFileName + "." + m_materialGroupTable.FILE_EXTENSION).c_str());
+}
+
+void CommandManager::MaterialTagLoadFile(eastl::string filePath)
+{
+	MaterialTagGroupTableIO materialTableIO;
+	materialTableIO.ReadInfo(filePath.c_str());
+
+	for (const auto& tagGroupElement : materialTableIO.tagGroupTable)
+	{
+		MaterialTagGroup grop = tagGroupElement.second;
+		m_materialGroupTable.RegisterMaterialGroupTable(&grop);
+	}
+}

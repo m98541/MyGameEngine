@@ -48,7 +48,9 @@ public:
 	//일단은 그룹명(ID) 벡터만 뽑아서 보여주는 방식으로 
 	//나중에 시간 남으면 트리형태 뷰어
 	eastl::vector<eastl::string> ShowMaterialGroupTable();
-	
+
+	void MaterialTagSaveFile(eastl::string filePath, eastl::string materialFileName);
+	void MaterialTagLoadFile(eastl::string filePath);
 
 
 private:

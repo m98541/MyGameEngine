@@ -361,7 +361,7 @@ int main(void)
             } while (!inputSuccessed);
 
             mainCmdManager.RenderPassFileCompileAndSave("ShaderResource",fileName + ".pass", fileName + ".ShaderTable", ShaderCompiler::API::D3D11);
-            
+            mainCmdManager.MaterialTagSaveFile("ShaderResource" , fileName);
         }
         else if (input == CommandListStr[CommandEnum::REGISTER_MATERIAL_TAG])
         {
@@ -574,9 +574,44 @@ int main(void)
 
             mainCmdManager.RegisterMaterialTagGroup(inputGroup);
         }
+        else if (input == CommandListStr[CommandEnum::MATERIAL_TAG_LOAD])
+        {
+            bool inputSuccessed = true;
+            std::cin.clear();
+            eastl::string passPath;
+            do
+            {
+                std::cout << "Please Input Material Tag Table Path\n";
+                std::cout << "Material Tag Table Path :";
+                if (!std::getline(std::cin, tempInput) || input.empty())
+                {
+                    inputSuccessed = false;
+                    std::cout << "fault input Please Retry.\n";
+                }
+                else
+                {
+                    passPath = tempInput.c_str();
+                    mainCmdManager.MaterialTagLoadFile(passPath);
+
+                }
+
+            } while (!inputSuccessed);
+        }
+        else if (input == CommandListStr[CommandEnum::VIEW_TABLE_MATERIAL])
+        {
+
+            std::cout << "-Material Tag Group Table-\n";
+
+            eastl::vector<eastl::string> materialTagGroupNames = mainCmdManager.ShowMaterialGroupTable();
+
+            for (const auto& name : materialTagGroupNames)
+            {
+                std::cout <<"-:" << name.c_str() << std::endl;
+            }
+
+        }
         else 
         {
-            // 4. 출력(Print): 그 외 커스텀 명령어 처리
             std::cout << "unkown command : " << input.c_str() << "'\n";
         }
 
@@ -585,5 +620,3 @@ int main(void)
 
 	return 0;
 }
-
-

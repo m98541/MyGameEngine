@@ -146,7 +146,6 @@ void MaterialTagGroupTableIO::WriteInfo(const char* jsonFilePath)
 	rapidjson::StringBuffer stringBuffer;
 	rapidjson::Writer<rapidjson::StringBuffer> writer(stringBuffer);
 
-
 	writer.StartObject();
 
 	writer.Key(MaterialTagGroupIO::KEY_TAG_GROUP);
@@ -159,8 +158,9 @@ void MaterialTagGroupTableIO::WriteInfo(const char* jsonFilePath)
 		groupIO.WriteInfo(writer);
 	}
 	writer.EndArray();
-
 	writer.EndObject();
 	
+	file << stringBuffer.GetString();
+	file.close();
 
 }
