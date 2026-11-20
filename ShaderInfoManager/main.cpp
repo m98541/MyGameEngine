@@ -12,7 +12,7 @@
 
 #include "CommandList.h"
 #include "CommandManager.h"
-
+#include "../StringFormat/StringFormatAssert.h"
 #include <iostream>
 #include <string>
 #include <limits>
@@ -361,11 +361,257 @@ int main(void)
             } while (!inputSuccessed);
 
             mainCmdManager.RenderPassFileCompileAndSave("ShaderResource",fileName + ".pass", fileName + ".ShaderTable", ShaderCompiler::API::D3D11);
-            
+            mainCmdManager.MaterialTagSaveFile("ShaderResource" , fileName);
+        }
+        else if (input == CommandListStr[CommandEnum::REGISTER_MATERIAL_TAG])
+        {
+            std::cout << "- REGISTER_MATERIAL_TAG\n";
+
+            int selectInputType;
+            static constexpr const int SINGLE = 1;
+            static constexpr const int GROUP = 2;
+            MaterialTagGroup inputGroup;
+            bool inputSuccessed = false;
+            do
+            {
+                std::cout << "- SELECT TYPE : 1.SINGLE 2.GROUP\n";
+                std::cout << "\n" << ">>";
+                std::cin >> selectInputType;
+                if (std::cin.fail() || (selectInputType != SINGLE && selectInputType != GROUP))
+                {
+                    std::cin.clear();
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                    inputSuccessed = false;
+                    std::cout << "fault input Please Retry SELECT TYPE \n";
+                }
+                else
+                    inputSuccessed = true;
+
+
+            } while (!inputSuccessed);
+
+            if (selectInputType == SINGLE)
+            {
+                //single 의 경우 단일 테그 이름이 곧 그룹 이름으로 통일
+                //테그가 1개짜리 그룹으로 만듬
+                eastl::string tagName;
+                eastl::string passName;
+
+                bool inputSuccessed = false;
+                do
+                {
+                    std::cout << "- Please Input Tag Name\n";
+                    std::cout << "tag name :";
+                    if (!std::getline(std::cin, tempInput) || tempInput.empty())
+                    {
+                        inputSuccessed = false;
+                        std::cout << "fault input Please Retry.\n";
+                    }
+                    else
+                    {
+                        inputSuccessed = true;
+                        tagName = tempInput.c_str();
+                    }
+
+
+                } while (!inputSuccessed);
+
+                inputSuccessed = false;
+                int selectRenderPass = -1;
+                eastl::vector<eastl::string> renderPassNames = mainCmdManager.GetRenderPassNames();
+                do
+                {
+                    std::cout << "- SELECT RenderPass :";
+                    int num = 0;
+                    for (const auto& name : renderPassNames)
+                    {
+                        std::cout << '[' << num << ']' << name.c_str() << ',';
+                        num++;
+                    }
+
+                    std::cout << "\n" << ">>";
+                    std::cin >> selectRenderPass;
+                    if (std::cin.fail() || selectRenderPass < 0 || selectInputType > renderPassNames.size())
+                    {
+                        std::cin.clear();
+                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                        inputSuccessed = false;
+                        std::cout << "fault input Please Retry SELECT RenderPass\n";
+                    }
+                    else
+                    {
+                        passName = renderPassNames[selectRenderPass];
+                        inputSuccessed = true;
+                    }
+                    
+
+                } while (!inputSuccessed);
+
+                inputGroup.tagGroupId = tagName;
+                inputGroup.RegisterMaterialTag(tagName , passName);
+
+            }
+            else if (selectInputType == GROUP)
+            {
+                eastl::string groupName;
+                bool inputSuccessed = false;
+                do
+                {
+                    std::cout << "- Please Input Tag Group Name\n";
+                    std::cout << "tag group name :";
+                    if (!std::getline(std::cin, tempInput) || tempInput.empty())
+                    {
+                        inputSuccessed = false;
+                        std::cout << "fault input Please Retry.\n";
+                    }
+                    else
+                    {
+                        inputSuccessed = true;
+                        groupName = tempInput.c_str();
+                    }
+
+
+                } while (!inputSuccessed);
+                inputGroup.tagGroupId = groupName;
+
+                bool addTag = true;
+
+                while (addTag)
+                {
+                    eastl::string tagName;
+                    eastl::string passName;
+
+                    bool inputSuccessed = false;
+                    do
+                    {
+                        std::cout << "- Please Input Tag Name\n";
+                        std::cout << "tag name :";
+                        if (!std::getline(std::cin, tempInput) || tempInput.empty())
+                        {
+                            inputSuccessed = false;
+                            std::cout << "fault input Please Retry.\n";
+                        }
+                        else
+                        {
+                            inputSuccessed = true;
+                            tagName = tempInput.c_str();
+                        }
+
+
+                    } while (!inputSuccessed);
+
+                    inputSuccessed = false;
+                    int selectRenderPass = -1;
+                    eastl::vector<eastl::string> renderPassNames = mainCmdManager.GetRenderPassNames();
+                    do
+                    {
+                        std::cout << "- SELECT RenderPass :";
+                        int num = 0;
+                        for (const auto& name : renderPassNames)
+                        {
+                            std::cout << '[' << num << ']' << name.c_str() << ',';
+                            num++;
+                        }
+
+                        std::cout << "\n" << ">>";
+                        std::cin >> selectRenderPass;
+                        if (std::cin.fail() || selectRenderPass < 0 || selectInputType > renderPassNames.size())
+                        {
+                            std::cin.clear();
+                            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                            inputSuccessed = false;
+                            std::cout << "fault input Please Retry SELECT RenderPass\n";
+                        }
+                        else
+                        {
+                            passName = renderPassNames[selectRenderPass];
+                            inputSuccessed = true;
+                        }
+
+
+                    } while (!inputSuccessed);
+                    inputGroup.RegisterMaterialTag(tagName, passName);
+
+                    inputSuccessed = false;
+                    eastl::string subInput;
+                    do
+                    {
+                        std::cout << "add input Material Tag? (y/n):";
+                        if (!std::getline(std::cin, tempInput) || tempInput.empty() || 
+                            !(
+                                tempInput == "yes"|| tempInput == "y" || tempInput == "Y" || tempInput == "YES" ||
+                                tempInput == "no" || tempInput == "n" || tempInput == "N" || tempInput == "NO"
+                            ))
+                        {
+                            inputSuccessed = false;
+                            std::cout << "fault input Please Retry.\n";
+                        }
+                        else
+                        {
+                            inputSuccessed = true;
+                            subInput = tempInput.c_str();
+                        }
+
+
+                    } while (!inputSuccessed);
+                    
+                    if (subInput == "yes" || subInput == "y" || subInput == "Y" || subInput == "YES")
+                    {
+                        addTag = true;
+                    }
+                    else if(subInput == "no" || subInput == "n" || subInput == "N" || subInput == "NO")
+                    {
+                        addTag = false;
+                    }
+                }
+
+
+            }
+            else
+            {
+                SF_ASSERTE(false , " [material tag input] unknown type input selectInputType: %d ", selectInputType);
+            }
+
+            mainCmdManager.RegisterMaterialTagGroup(inputGroup);
+        }
+        else if (input == CommandListStr[CommandEnum::MATERIAL_TAG_LOAD])
+        {
+            bool inputSuccessed = true;
+            std::cin.clear();
+            eastl::string passPath;
+            do
+            {
+                std::cout << "Please Input Material Tag Table Path\n";
+                std::cout << "Material Tag Table Path :";
+                if (!std::getline(std::cin, tempInput) || input.empty())
+                {
+                    inputSuccessed = false;
+                    std::cout << "fault input Please Retry.\n";
+                }
+                else
+                {
+                    passPath = tempInput.c_str();
+                    mainCmdManager.MaterialTagLoadFile(passPath);
+
+                }
+
+            } while (!inputSuccessed);
+        }
+        else if (input == CommandListStr[CommandEnum::VIEW_TABLE_MATERIAL])
+        {
+
+            std::cout << "-Material Tag Group Table-\n";
+
+            eastl::vector<eastl::string> materialTagGroupNames = mainCmdManager.ShowMaterialGroupTable();
+
+            for (const auto& name : materialTagGroupNames)
+            {
+                std::cout <<"-:" << name.c_str() << std::endl;
+            }
+
         }
         else 
         {
-            // 4. 출력(Print): 그 외 커스텀 명령어 처리
             std::cout << "unkown command : " << input.c_str() << "'\n";
         }
 
@@ -374,5 +620,3 @@ int main(void)
 
 	return 0;
 }
-
-

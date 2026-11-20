@@ -288,9 +288,6 @@ void RenderPassInfo::WriteJsonObject(rapidjson::Writer<rapidjson::StringBuffer>&
 	writer.Key(KEY_RENDER_PASS_ID);
 	writer.String(m_renderPassId.c_str());
 
-	writer.Key(KEY_MATERIAL_TAG);
-	writer.String(m_materialTag.c_str());
-
 	writer.Key(KEY_PASS_INPUT_CONTEXT);
 	m_passInputContext.WriteJsonObject(writer);
 
@@ -324,15 +321,6 @@ void RenderPassInfo::ReadJsonObject(const rapidjson::Value& jsonValue)
 	if (jsonValue.HasMember(KEY_RENDER_PASS_ID))
 	{
 		m_renderPassId = jsonValue[KEY_RENDER_PASS_ID].GetString();
-	}
-	else
-	{
-
-	}
-
-	if (jsonValue.HasMember(KEY_MATERIAL_TAG))
-	{
-		m_materialTag = jsonValue[KEY_MATERIAL_TAG].GetString();
 	}
 	else
 	{
